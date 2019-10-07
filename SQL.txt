@@ -1,3 +1,12 @@
+
+CREATE TABLE role (
+  roleID serial PRIMARY KEY,
+  roleName varchar(25) NOT NULL
+);
+
+
+
+
 CREATE TABLE employee(
 employeeID serial PRIMARY KEY,
 firstName VARCHAR (200) NOT NULL,
@@ -5,7 +14,10 @@ lastName VARCHAR (200) NOT NULL,
 username VARCHAR (200) NOT NULL UNIQUE,
 password VARCHAR (200) NOT NULL,
 phoneNumber VARCHAR (12) NOT NULL,
-email VARCHAR (100) NOT NULL 
+email VARCHAR (100) NOT NULL,
+roleID INTEGER NOT NULL,
+CONSTRAINT employee1 FOREIGN KEY (roleID) REFERENCES role(roleID)
+MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE building(
@@ -31,7 +43,7 @@ employeeID INTEGER NOT NULL,
 buildingID INTEGER NOT NULL,
 unitID INTEGER NOT NULL,
 workType VARCHAR(100) NOT NULL,
-workOrdernumber INTEGER NOT NULL UNIQUE,
+workOrdernumber VARCHAR(2000) NOT NULL UNIQUE,
 startTimeAuto TIMESTAMP NOT NULL,
 endTimeAuto TIMESTAMP ,
 startTimeManual TIMESTAMP NOT NULL,
@@ -101,10 +113,12 @@ MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 
 INSERT INTO building (buildingName, buildingAddress,postalCode,numberOfrooms) VALUES ('Jonquil','1600 W. Jonquil Terrace 7700 N. Ashland',60626 , 200), ('Lloyd','7625-29 N. Bosworth Avenue','60626','200'), ('New Life','7632-34 N. Paulina Avenue','60626','200'),  ('Ministry Center','7630 N. Paulina Avenue','60626','200'), ('JCP','1546 W. Jonquil Avenue','60626','200'),('No Bos Condo','7645-47 N. Bosworth Avenue','60626','200'), ('Fargo','1449 W. Fargo Avenue','60626','200'), ('Esperanza','1556-58 W. Jonquil Avenue','60626','200'), ('Phonenix 1','7729-31 N. Hermitage Avenue','60626','200'),('Phonenix 2','7727 N. Hermitage Avenue','60626','200')
 
-Drop table building,unit,apartmentrehab,work,maintenance,employee,others,pestcontrol,landscaping
+Drop table building,role,unit,apartmentrehab,work,maintenance,employee,others,pestcontrol,landscaping
 
 
-
+INSERT INTO `role` (`roleID`, `roleName`) VALUES
+(1, 'user'),
+(2, 'admin');
 
 
 

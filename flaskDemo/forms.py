@@ -28,12 +28,34 @@ class ForgetPasswordForm (FlaskForm):
 class ChangePasswordForm(FlaskForm):
     oldpassword = PasswordField('Old Password',validators= [DataRequired()])
     newpassword = PasswordField('New Password',validators= [DataRequired()])
-    confirmpassword = PasswordField('New Password',validators= [DataRequired(), EqualTo('newpassword')])
+    confirmpassword = PasswordField('Confirm Password',validators= [DataRequired(), EqualTo('newpassword')])
     submit = SubmitField('Change Password')
     
     def validate_newpassword(self, newpassword):
         if len(newpassword.data) < 5:
             raise ValidationError('Password must be at least 5 characters.')
+
+class ChangeEmailForm(FlaskForm):
+    oldemail = StringField('Old Email',validators= [DataRequired()])
+    newemail = StringField('New Email',validators= [DataRequired()])
+    confirmemail = StringField('Confirm Email',validators= [DataRequired(), EqualTo('newemail')])
+    submit = SubmitField('Change Email')
+    
+    def validate_newemail(self, newemail):
+        user = employee.query.filter_by(email=newemail.data).first()
+        if user:
+            raise ValidationError('Email is taken, please use other email')
+            
+class ChangePhoneForm(FlaskForm):
+    oldphone = StringField('Old Phone',validators= [DataRequired()])
+    newphone = StringField('New Phone',validators= [DataRequired()])
+    confirmphone = StringField('Confirm Phone',validators= [DataRequired(), EqualTo('newphone')])
+    submit = SubmitField('Change Phone')
+    
+    def validate_newPhone(self, newphone):
+        user = employee.query.filter_by(phoneNumber=newphone.data).first()
+        if user:
+            raise ValidationError('Phone number is taken, please use other phone number')
     
 
 class RegistrationForm(FlaskForm):
@@ -82,15 +104,17 @@ class StartForm(FlaskForm):
     startTime =  DateTimeLocalField('Start Time',validators=[InputRequired()],format='%Y-%m-%dT%H:%M')
     submit = SubmitField("Start")
     
-    def validate_workOrdernumber(self,workOrdernumber):
-        Work = work.query.filter_by(workOrdernumber=workOrdernumber.data).first()
-        if Work:
-             raise ValidationError("Work order number present, please verify your work order number")
+    def validate_startTime(self, startTime):
+        if (startTime.data > datetime.now()):
+            raise ValidationError("Start Date is in the future, invalid")
+            
+class StartNonUnitForm(FlaskForm):
+    startTime =  DateTimeLocalField('Start Time',validators=[InputRequired()],format='%Y-%m-%dT%H:%M')
+    submit = SubmitField("Start")
     
     def validate_startTime(self, startTime):
         if (startTime.data > datetime.now()):
             raise ValidationError("Start Date is in the future, invalid")
-
 
 
 class MaintenanceForm(FlaskForm):

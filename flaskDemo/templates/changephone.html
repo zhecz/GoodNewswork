@@ -22,47 +22,47 @@
               <div style="margin: 10px;">
                 <ul>
                  <li><div class="form-group">
-                    <font color="#fff">{{ form. oldpassword.label(class="form-control-label") }}</font>
+                    <font color="#fff">{{ form. oldphone.label(class="form-control-label") }}</font>
 
-                    {% if form. oldpassword.errors %}
-                        {{ form. oldpassword(class="form-control form-control-lg is-invalid") }}
+                    {% if form. oldphone.errors %}
+                        {{ form. oldphone(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form. oldpassword.errors %}
+                            {% for error in form. oldphone.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form. oldpassword(class="form-control form-control-lg") }}
+                        {{ form. oldphone(class="form-control form-control-lg") }}
                     {% endif %}
                 </li>
                 <ul>
                  
                 <li><div class="form-group">
-                    <font color="#fff"> {{ form.newpassword.label(class="form-control-label") }}</font>
-                    {% if form.newpassword.errors %}
-                        {{ form.newpassword(class="form-control form-control-lg is-invalid") }}
+                    <font color="#fff"> {{ form.newphone.label(class="form-control-label") }}</font>
+                    {% if form.newphone.errors %}
+                        {{ form.newphone(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.newpassword.errors %}
+                            {% for error in form.newphone.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.newpassword(class="form-control form-control-lg") }}
+                        {{ form.newphone(class="form-control form-control-lg") }}
                     {% endif %}
                 </div></li>
                 <li>
                 
                    <li><div class="form-group">
-                    <font color="#fff"> {{ form.confirmpassword.label(class="form-control-label") }}</font>
-                    {% if form.confirmpassword.errors %}
-                        {{ form.confirmpassword(class="form-control form-control-lg is-invalid") }}
+                    <font color="#fff"> {{ form.confirmphone.label(class="form-control-label") }}</font>
+                    {% if form.confirmphone.errors %}
+                        {{ form.confirmphone(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.confirmpassword.errors %}
+                            {% for error in form.confirmphone.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.confirmpassword(class="form-control form-control-lg") }}
+                        {{ form.confirmphone(class="form-control form-control-lg") }}
                     {% endif %}
                 </div></li>
                 <li>

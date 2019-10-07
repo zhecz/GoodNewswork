@@ -17,52 +17,52 @@
         <form method="POST">
             {{ form.hidden_tag() }}
             
-            <center> <legend style="color: #fff" >Change Password</legend></center>
+            <center> <legend style="color: #fff" >Log In</legend></center>
            
               <div style="margin: 10px;">
                 <ul>
                  <li><div class="form-group">
-                    <font color="#fff">{{ form. oldpassword.label(class="form-control-label") }}</font>
+                    <font color="#fff">{{ form. oldemail.label(class="form-control-label") }}</font>
 
-                    {% if form. oldpassword.errors %}
-                        {{ form. oldpassword(class="form-control form-control-lg is-invalid") }}
+                    {% if form. oldemail.errors %}
+                        {{ form. oldemail(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form. oldpassword.errors %}
+                            {% for error in form. oldemail.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form. oldpassword(class="form-control form-control-lg") }}
+                        {{ form. oldemail(class="form-control form-control-lg") }}
                     {% endif %}
                 </li>
                 <ul>
                  
                 <li><div class="form-group">
-                    <font color="#fff"> {{ form.newpassword.label(class="form-control-label") }}</font>
-                    {% if form.newpassword.errors %}
-                        {{ form.newpassword(class="form-control form-control-lg is-invalid") }}
+                    <font color="#fff"> {{ form.newemail.label(class="form-control-label") }}</font>
+                    {% if form.newemail.errors %}
+                        {{ form.newemail(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.newpassword.errors %}
+                            {% for error in form.newemail.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.newpassword(class="form-control form-control-lg") }}
+                        {{ form.newemail(class="form-control form-control-lg") }}
                     {% endif %}
                 </div></li>
                 <li>
                 
                    <li><div class="form-group">
-                    <font color="#fff"> {{ form.confirmpassword.label(class="form-control-label") }}</font>
-                    {% if form.confirmpassword.errors %}
-                        {{ form.confirmpassword(class="form-control form-control-lg is-invalid") }}
+                    <font color="#fff"> {{ form.confirmemail.label(class="form-control-label") }}</font>
+                    {% if form.confirmemail.errors %}
+                        {{ form.confirmemail(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.confirmpassword.errors %}
+                            {% for error in form.confirmemail.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.confirmpassword(class="form-control form-control-lg") }}
+                        {{ form.confirmemail(class="form-control form-control-lg") }}
                     {% endif %}
                 </div></li>
                 <li>

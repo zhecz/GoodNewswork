@@ -6,10 +6,19 @@ from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
-
+    
 @login_manager.user_loader
 def load_user(user_id):
     return employee.query.get(int(user_id))
+
+class role(db.Model, UserMixin):
+    __tablename__ = 'Role'
+    __table_args__ = {'extend_existing': False}
+    roleID = db.Column(db.Integer, primary_key=True)
+    roleName = db.Column(db.String(25), nullable=False)
+    #employee = db.relationship("Employee",backref = 'role',lazy = True)
+    
+
 
 class employee(db.Model, UserMixin):
     __tablename__ = 'Employee'
@@ -21,8 +30,11 @@ class employee(db.Model, UserMixin):
     password = db.Column(db.String(70), nullable=False)
     phoneNumber = db.Column(db.String(12), nullable=False)
     email = db.Column(db.String(100), nullable=False)
+    roleID = db.Column(db.Integer, db.ForeignKey('Role.roleID'), nullable=False)
     def get_id(self): 
         return (self.employeeID)
+
+
 
 
 class building(db.Model, UserMixin):
@@ -52,7 +64,7 @@ class work(db.Model, UserMixin):
     buildingID = db.Column(db.Integer,db.ForeignKey('Building.buildingID'),nullable = False)
     unitID = db.Column(db.Integer, db.ForeignKey('Unit.unitID'),nullable = False)
     workType = db.Column(db.String(100),nullable = False)
-    workOrdernumber = db.Column(db.Integer,unique=True,nullable = False)
+    workOrdernumber = db.Column(db.String,unique=True,nullable = False)
     startTimeAuto = db.Column(db.DateTime,nullable = False)
     endTimeAuto = db.Column(db.DateTime,nullable = True)
     startTimeManual = db.Column(db.DateTime,nullable = False)
