@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+  {% block content %}
+  <div class="row" style="margin-top:100px">
+
+
+
+    <div style=" justify-content: center;">
+    
+   
+    <div style= "display: flex;">
+
+   
+  
+ 
+      <fieldset>
+               
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <center> <legend style="color: #fff" >Log In</legend></center>
+           
+              <div style="margin: 10px;">
+                <ul>
+                 <li><div class="form-group">
+                    <font color="#fff">{{ form. username.label(class="form-control-label") }}</font>
+
+                    {% if form. username.errors %}
+                        {{ form. username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form. username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form. username(class="form-control form-control-lg") }}
+                    {% endif %}
+                </li>
+                <ul>
+                 
+                <li><div class="form-group">
+                    <font color="#fff"> {{ form.password.label(class="form-control-label") }}</font>
+                    {% if form.password.errors %}
+                        {{ form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div></li>
+                <li>
+               <!-- 
+               <div style= "margin-left:20px;margin-bottom:20px;"> 
+                    {{ form.remember(class="form-check-input") }}
+                   <left><font color="#fff"> {{ form.remember.label() }}</font></left>
+                </div>
+                </li> 
+                -->
+               
+                  <div class="form-group">
+               <center> {{ form.submit(class="btn btn-outline-info") }}</center>
+                <small class="text-muted ml" color="#00BFFF">
+              <center> <a class="btn-show-forgotpass" href="{{ url_for('forgotpass') }}">Forgot Password?</a></center>
+            </small>
+            </div>
+            
+             
+            
+            
+                
+         </ul>
+         
+         </fieldset>
+         </div>
+         <ul>
+         
+        
+    
+           
+            </ul>
+               
+        </form>
+         <div class="border-top pt-3">
+        <center><small class="text-muted">
+           <font color="#fff">Don't Have An Account?</font> <a class="btn-show-word" href="{{ url_for('register') }}">Sign Up</a>
+        </small></center>
+    </div>
+    </div>
+   
+    </div>
+    
+{% endblock content %}

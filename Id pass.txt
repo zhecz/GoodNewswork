@@ -1,0 +1,4 @@
+Gmail/elephantSQL
+id: goodnewspartners1@gmail.com
+password:goodnews24
+

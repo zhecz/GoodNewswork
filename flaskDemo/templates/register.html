@@ -1,0 +1,140 @@
+{% extends "layout.html" %}
+{% block content %}
+<div style="margin-top:100px">
+
+<center> <legend style="color: #fff" >Join Today</legend></center></div>
+    <div style="width: 100%; justify-content: center; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex;">
+      <fieldset>
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+           
+              <div style="margin: 10px;">
+                <ul>
+                 <li><div class="form-group">
+                    <font color="#fff">{{ form.firstName.label(class="form-control-label") }}</font>
+
+                    {% if form.firstName.errors %}
+                        {{ form.firstName(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.firstName.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.firstName(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div></li>
+                <li> <div class="form-group">
+                    <font color="#fff">{{ form.username.label(class="form-control-label") }}</font>
+
+                    {% if form.username.errors %}
+                        {{ form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.username(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div></li>
+                  <li><div class="form-group">
+                    <font color="#fff"> {{ form.password.label(class="form-control-label") }}</font>
+                    {% if form.password.errors %}
+                        {{ form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                </div></li>
+                </ul>
+                </fieldset>
+                <fieldset>
+                <ul>
+                 <div style="margin: 10px;">
+                <li><div class="form-group">
+                    <font color="#fff">{{ form. lastName.label(class="form-control-label") }}</font>
+
+                    {% if form. lastName.errors %}
+                        {{ form. lastName(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form. lastName.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form. lastName(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div></li>
+                 
+                <li><div class="form-group">
+                    <font color="#fff">{{ form.phone.label(class="form-control-label") }}</font>
+
+                    {% if form.phone.errors %}
+                        {{ form.phone(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.phone.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.phone(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div></li>
+              
+                <li><div class="form-group">
+                    <font color="#fff"> {{ form.confirm_password.label(class="form-control-label") }}</font>
+                    {% if form.confirm_password.errors %}
+                        {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirm_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.confirm_password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div></li>
+                
+         </ul>
+         </fieldset>
+         <ul>
+         <fieldset>
+      
+                </fieldset>
+                </ul>
+         <ul>
+         </div>
+         <fieldset>
+              <li><div class="form-group">
+                    <font color="#fff"> {{ form.email.label(class="form-control-label") }}</font>
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div></li>
+            <div class="form-group">
+               <center> {{ form.submit(class="btn btn-outline-info") }}</center>
+            </div>
+            </ul>
+               
+        </form>
+         <div class="border-top pt-3">
+        <center> <small class="text-muted">
+           <font color="#FFFFFF"> Already Have An Account?</font> <a class="btn-show-word" href="{{ url_for('login') }}">Log In</a>
+        </small></center>
+    </div>
+    </div>
+   
+{% endblock content %}
