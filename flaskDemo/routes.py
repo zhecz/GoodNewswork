@@ -24,10 +24,10 @@ admin_permission = Permission(RoleNeed('admin'))
 
 @app.route("/")
 
-#database manipulation
+##database manipulation
 #@app.route("/data", methods=['GET', 'POST'])
 #def data():
-
+#
 #    Building = building(buildingName='Lloyd',buildingAddress='7625-29 N. Bosworth Avenue',postalCode =60626 ,numberOfrooms= 200)
 #    Building1 = building(buildingName='New Life',buildingAddress='7632-34 N. Paulina Avenue',postalCode =60626 ,numberOfrooms= 200)
 #    Building2 = building(buildingName='Ministry Center',buildingAddress='7630 N. Paulina Avenue',postalCode =60626 ,numberOfrooms= 200)
@@ -38,10 +38,11 @@ admin_permission = Permission(RoleNeed('admin'))
 #    Building7 = building(buildingName='Phoenix 1',buildingAddress='7729-31 N. Hermitage Avenue',postalCode =60626 ,numberOfrooms= 200)
 #    Building8 = building(buildingName='Phoenix 2',buildingAddress='7727 N. Hermitage Avenue',postalCode =60626 ,numberOfrooms= 200)
 #    Building9 = building(buildingName='Jonquil',buildingAddress='1600 W. Jonquil Terrace 7700 N. Ashland',postalCode =60626 ,numberOfrooms= 200)
-#    Role1 = role(roleName = "user")
-#    Role2 = role(roleName = "admin")
+#    Role1 = role(roleName = "Maintenance")
+#    Role2 = role(roleName = "Front Desk")
+#    Role3 = role(roleName = "admin")
 #    hashed_password = bcrypt.generate_password_hash("gnp7737644998").decode('utf-8')
-#    adminuser = employee(firstName="Good News",lastName="Partners",username="goodnews24",password=hashed_password,phoneNumber = "7737644998",email = "Brandon@goodnewspartners.org",roleID = 1 )
+#    adminuser = employee(firstName="Good News",lastName="Partners",username="goodnews24",password=hashed_password,phoneNumber = "7737644998",email = "Brandon@goodnewspartners.org",roleID = 3 )
 #    db.session.add(Building)
 #    db.session.add(Building1)
 #    db.session.add(Building2)
@@ -54,7 +55,7 @@ admin_permission = Permission(RoleNeed('admin'))
 #    db.session.add(Building9)
 #    db.session.add(Role1)
 #    db.session.add(Role2)
-#  
+#    db.session.add(Role3)
 #    
 #    
 #    db.session.commit()
@@ -238,6 +239,10 @@ def startstop(worktype):
 @app.route("/building/<string:worktype>", methods=['GET', 'POST'])
 @login_required
 def buildingchoice(worktype):
+    code = work.query.filter(work.employeeID == current_user.employeeID,work.endTimeAuto == None, work.endTimeManual == None).first()
+    if code:
+        flash("There is still ongoing work, please stop your current work before proceeding","danger")
+        return redirect(url_for('stop',worktype=worktype))
     Building= building.query.all()
     buildingList = [(b.buildingID,b.buildingName) for b in Building]
     form = BuildingForm()
@@ -290,7 +295,8 @@ def start(worktype,buildingname):
 @login_required
 def stop(worktype):
     if worktype=="maintainence":
-        return redirect(url_for('maintainence'))
+        maintcode = work.query.filter_by(employeeID = current_user.employeeID,workType = "maintainence",endTimeAuto = None, endTimeManual = None)
+        return render_template("mainttable.html",works = maintcode)
     elif worktype=="apartmentrehab":
         return redirect(url_for('apartmentrehabs'))
     elif worktype=="landscaping":
@@ -301,17 +307,14 @@ def stop(worktype):
         return redirect(url_for('others'))
 
 
-@app.route("/maintainence", methods=['GET', 'POST'])
+@app.route("/maintainence/<string:workorder>", methods=['GET', 'POST'])
 @login_required
-def maintainence():
+def maintainence(workorder):
     form = MaintenanceForm()
     if form.validate_on_submit():
-         Work = work.query.filter(work.workOrdernumber==form.workOrdernumber.data).first()
+         Work = work.query.filter(work.workOrdernumber==workorder).first()
          if(form.endTime.data < Work.startTimeManual):
              flash("End Date is earlier than Start Date, invalid","danger")
-             return redirect(url_for('maintainence'))
-         elif(Work.workType != "maintainence"):
-             flash("Work Type for this work order number is not maintainence,wrong work order number",'danger')
              return redirect(url_for('maintainence'))
          Work.endTimeManual=form.endTime.data
          Work.endTimeAuto=datetime.now()

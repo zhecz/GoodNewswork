@@ -46,6 +46,8 @@ class building(db.Model, UserMixin):
     postalCode = db.Column(db.Integer, nullable=False)
     numberOfrooms = db.Column(db.Integer, nullable=False)
 
+
+
 class unit(db.Model, UserMixin):
     __tablename__ = 'Unit'
     __table_args__ = {'extend_existing': False}

@@ -45,29 +45,33 @@
 		 
 		<main role="main" class="container-contact100">
 		
-		<div class="contact100-notif">
 		
-	
-				
-			
+         
+    <div class="contact100-field">
+    <div>
+    <div class="contact-100-notif">
+
           {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
               {% for category, message in messages %}
               	
-                <div class="alert alert-{{ category }}"> <font size="1em">
+                <div class="alert alert-{{ category }}" style="margin-bottom:0px"> <font size="1em">
+                  <span id='close'>x</span>
                   {{ message }}</font>
                 </div>
             
               {% endfor %}
             {% endif %}
           {% endwith %}
-         
+         </div>
           </div>
-         
-    <div class="contact100-field">
-     
+        <div>
+        <center>
           {% block content %}
 		 {% endblock %}
+		 </center>
+		 </div>
+
       </div>
       
        

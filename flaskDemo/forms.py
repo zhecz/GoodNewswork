@@ -118,7 +118,6 @@ class StartNonUnitForm(FlaskForm):
 
 
 class MaintenanceForm(FlaskForm):
-    workOrdernumber = IntegerField('Work Order Number',validators=[DataRequired()])
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     maintchoice = [('Electrical-Kitchen', 'Electrical-Kitchen'),('Electrical-Bathroom', 'Electrical-Bathroom'),
                    ('Electrical-Building', 'Electrical-Building'),('Plumbing-Kitchen', 'Plumbing-Kitchen'),('Plumbing-Bathroom', 'Plumbing-Bathroom'),

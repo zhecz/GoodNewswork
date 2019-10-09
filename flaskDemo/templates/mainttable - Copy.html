@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+  {% block content %}
+  	<table class="blueTable">
+        <thead>
+            <tr>
+                <th>Work Order Number</th>
+                <th>Building</th>
+                <th>Unit</th>
+            </tr>
+        </thead>
+            <tbody>
+               {% for work in works %}
+                    <tr>
+							<td>{{ work.workOrdernumber }}</td>
+							<td> {{ work.buildingID }}</td>
+							<td>{{ work.unitID }} </td>
+							<td> <a href="{{ url_for('maintainence') }}">Stop</a> </td>
+                        </tr>
+                    {% endfor %}
+</tbody>
+</table>
+              
+    
+{% endblock content %}
