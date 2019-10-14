@@ -8,7 +8,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flask_principal import Principal, Identity, AnonymousIdentity, identity_changed, Permission, RoleNeed, identity_loaded
 from flaskDemo.models import role,employee, unit,building,work,maintenance,apartmentrehab,others,landscaping,pestcontrol
 from flaskDemo.forms import ChangeEmailForm,ChangePhoneForm,ChangePasswordForm,ForgetPasswordForm,StartForm,BuildingForm,RegistrationForm,LoginForm,MaintenanceForm,ApartmentRehabForm,LandscapingForm,PestControlForm,OtherForm
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import or_, update, and_
 import yaml
 import pandas as pd
@@ -265,8 +265,16 @@ def startstop_frontdesk():
 def start_frontdesk():
     code = work.query.filter(work.employeeID == current_user.employeeID,work.endTimeAuto == None, work.endTimeManual == None).first()
     if code:
-        flash("You have started already, please press stop to finish current work","danger")
-        return redirect(url_for('startstop_frontdesk'))
+        limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
+        if((datetime.now()-code.startTimeAuto)>limit) or ((datetime.now()-code.startTimeManual)>limit):
+            code.endTimeAuto = datetime(9999,1,1,1,1,1)
+            code.endTimeManual = datetime(9999,1,1,1,1,1)
+            db.session.commit()
+            flash("Start time exceeds 24 hours, please contact Ken/Brandon to adjust previous work","danger")
+            return render_template('startstop_frontdesk.html')
+        else:
+            flash("You have started already, please press stop to finish current work","danger")
+            return redirect(url_for('startstop_frontdesk'))
     Building= building.query.all()
     buildingList = [(b.buildingID,b.buildingName) for b in Building]
     form = BuildingForm()
@@ -293,12 +301,21 @@ def stop_frontdesk():
     if Work == None:
         flash("No work have been started, please start a new session","danger")
         return redirect(url_for('startstop_frontdesk'))
+    code = work.query.filter(work.employeeID == current_user.employeeID,work.endTimeAuto == None, work.endTimeManual == None).first()
+    if code:
+        limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
+        if((datetime.now()-code.startTimeAuto)>limit) or ((datetime.now()-code.startTimeManual)>limit):
+            code.endTimeAuto = datetime(9999,1,1,1,1,1)
+            code.endTimeManual = datetime(9999,1,1,1,1,1)
+            db.session.commit()
+            flash("Start time exceeds 24 hours, please contact Ken/Brandon to adjust previous work","danger")
+            return render_template('startstop_frontdesk.html')
     Work.endTimeManual=datetime.now()
     Work.endTimeAuto=datetime.now()
     db.session.commit()
     logout_user()
     identity_changed.send(current_app._get_current_object(),identity=AnonymousIdentity())
-    flash("successfully stoped this shift!","success")
+    flash("successfully stopped this shift!","success")
     
     return redirect(url_for('home'))
      
@@ -327,8 +344,16 @@ def startstop(worktype):
 def buildingchoice(worktype):
     code = work.query.filter(work.employeeID == current_user.employeeID,work.endTimeAuto == None, work.endTimeManual == None).first()
     if code:
-        flash("There is still ongoing work, please stop your current work before proceeding","danger")
-        return redirect(url_for('stop',worktype=worktype))
+        limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
+        if((datetime.now()-code.startTimeAuto)>limit) or ((datetime.now()-code.startTimeManual)>limit):
+            code.endTimeAuto = datetime(9999,1,1,1,1,1)
+            code.endTimeManual = datetime(9999,1,1,1,1,1)
+            db.session.commit()
+            flash("Start time exceeds 24 hours, please contact Ken/Brandon to adjust previous work","danger")
+            return render_template('choices.html')
+        else:
+            flash("There is still ongoing work, please stop your current work before proceeding","danger")
+            return redirect(url_for('stop',worktype=worktype))
     Building= building.query.all()
     buildingList = [(b.buildingID,b.buildingName) for b in Building]
     form = BuildingForm()
@@ -455,6 +480,15 @@ def start(worktype,buildingname):
 @login_required
 @maintainence_permission.require(http_exception=403)
 def stop(worktype):
+    code = work.query.filter(work.employeeID == current_user.employeeID,work.endTimeAuto == None, work.endTimeManual == None).first()
+    if code:
+        limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
+        if((datetime.now()-code.startTimeAuto)>limit) or ((datetime.now()-code.startTimeManual)>limit):
+            code.endTimeAuto = datetime(9999,1,1,1,1,1)
+            code.endTimeManual = datetime(9999,1,1,1,1,1)
+            db.session.commit()
+            flash("Start time exceeds 24 hours, please contact Ken/Brandon to adjust previous work","danger")
+            return render_template('choices.html')
     if worktype=="maintainence":
         maintcode = work.query.filter_by(employeeID = current_user.employeeID,workType = "maintainence",endTimeAuto = None, endTimeManual = None)
         return render_template("mainttable.html",works = maintcode)
