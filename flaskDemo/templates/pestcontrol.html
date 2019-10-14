@@ -5,21 +5,7 @@
  <fieldset>
   <form method="POST">
             {{ form.hidden_tag() }}
-              <div style="margin: 10px;">
-                 <li><div class="form-group">
-                    <font color="#fff">{{ form.workOrdernumber.label(class="form-control-label") }}
-
-                    {% if form.workOrdernumber.errors %}
-                        {{ form.workOrdernumber(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.workOrdernumber.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.workOrdernumber(class="form-control form-control-lg") }}
-                    {% endif %}
-                    </div> </div></li>
+            
                     
                      <div style="margin: 10px;">
                     <li><div class="form-group">

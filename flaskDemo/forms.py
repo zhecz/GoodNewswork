@@ -70,12 +70,18 @@ class RegistrationForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=20)])
     phone = StringField('Phone Number',validators=[DataRequired(),Length(min=10, max=11)])
     email = StringField('Email address', validators= [DataRequired(),Email()])
+    position = SelectField('Position',choices=[('Maintenance','Maintenance'),('Front Desk','Front Desk')], validators=[DataRequired()],default=None)
     submit = SubmitField('Sign Up')
 
     def validate_username(self, username):
         user = employee.query.filter_by(username=username.data).first()
         if user:
             raise ValidationError('That username is taken.')
+            
+    def validate_email(self, email):
+        user = employee.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('That email is taken.')
     
     def validate_password(self, password):
         if len(password.data) < 5:
@@ -83,8 +89,7 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username',
-                        validators=[DataRequired()])
+    username = StringField('Username',validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
@@ -146,7 +151,6 @@ class MaintenanceForm(FlaskForm):
     
     
 class ApartmentRehabForm(FlaskForm):
-    workOrdernumber = IntegerField('Work Order Number',validators=[DataRequired()])
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     apartreh = [('Bathroom','Bathroom'),('Painting','Painting'),('Plumbing','Plumbing'),('Sanding','Sanding'),('Gas','Gas'),('Remove Garbage','Remove Garbage'),('Electrical','Electrical'),('Others','Others')]
     rehabType = SelectField('Rehabilitation Type', choices=apartreh,validators=[DataRequired()])
@@ -166,7 +170,6 @@ class ApartmentRehabForm(FlaskForm):
             raise ValidationError("End Date is in the future, invalid")
 
 class LandscapingForm(FlaskForm):
-    workOrdernumber = IntegerField('Work Order Number',validators=[DataRequired()])
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     landscapingType = StringField('Landscaping type',validators=[DataRequired()])
     description =  StringField('Description',validators=[DataRequired()])
@@ -184,7 +187,6 @@ class LandscapingForm(FlaskForm):
             raise ValidationError("End Date is in the future, invalid")
 
 class PestControlForm(FlaskForm):
-    workOrdernumber = IntegerField('Work Order Number',validators=[DataRequired()])
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     description =  StringField('Description',validators=[DataRequired()])
     picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
@@ -201,7 +203,6 @@ class PestControlForm(FlaskForm):
             raise ValidationError("End Date is in the future, invalid")
 
 class OtherForm(FlaskForm):
-    workOrdernumber = IntegerField('Work Order Number',validators=[DataRequired()])
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     otherchoice = [('Pick Up Groceries','Pick Up Groceries'),('Go to Store','Go to Store'),('others','others')]
     othersType = SelectField("Other Categories",choices = otherchoice,validators=[DataRequired()])

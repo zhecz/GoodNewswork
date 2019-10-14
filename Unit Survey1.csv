@@ -1,11 +1,17 @@
 propertyname,unit
 Ministry Center,7630
-Ministry Center,    7628 S
 Ministry Center,7628.5
+Ministry Center,    7628 S
+Ministry Center,Others
+Ministry Center,Basement
 New Life,    7632-2
 New Life,    7632-M
 New Life,    7632-N
+New Life,Others
+New Life,Basement
 No Bos Condo,        3N
+No Bos Condo,Others
+No Bos Condo,Basement
 Phoenix 1,        1B
 Phoenix 1,        1D
 Phoenix 1,        1E
@@ -22,10 +28,14 @@ Phoenix 1,        GA
 Phoenix 1,        GC
 Phoenix 1,        GD
 Phoenix 1,        GH
+Phoenix 1,Others
+Phoenix 1,Basement
 Phoenix 2,1
 Phoenix 2,2
 Phoenix 2,3
 Phoenix 2,         B
+Phoenix 2,Others
+Phoenix 2,Basement
 Lloyd,    7625-1
 Lloyd,    7625-2
 Lloyd,    7625-3
@@ -36,6 +46,8 @@ Lloyd,    7629-1
 Lloyd,    7629-2
 Lloyd,    7629-3
 Lloyd,    7629-B
+Lloyd,Others
+Lloyd,Basement
 Esperanza,    1556-1
 Esperanza,    1556-2
 Esperanza,    1556-3
@@ -53,11 +65,15 @@ Esperanza,    7709-B
 Esperanza,    7711-1
 Esperanza,    7711-2
 Esperanza,    7711-3
+Esperanza,Others
+Esperanza,Basement
 Fargo,    1449-1
 Fargo,    1449-3
 Fargo,    1449-B
 Fargo,   1449-2F
 Fargo,   1449-2R
+Fargo,Others
+Fargo,Basement
 JCP,  1546-005
 JCP,  1546-006
 JCP,  1546-007
@@ -85,6 +101,8 @@ JCP,  1546-305
 JCP,  1546-306
 JCP,  1546-307
 JCP,  1546-308
+JCP,Others
+JCP,Basement
 Jonquil,  1600-101
 Jonquil,  1600-102
 Jonquil,  1600-103
@@ -156,3 +174,5 @@ Jonquil,  1600-320
 Jonquil,  1600-321
 Jonquil,  1600-322
 Jonquil,  1600-323
+Jonquil,Others
+Jonquil,Basement

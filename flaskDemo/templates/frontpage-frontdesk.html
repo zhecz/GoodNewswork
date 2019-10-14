@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<fieldset class="contact100-choices">
+	<div style="margin: 25px;">
+					<a href="{{url_for('startstop_frontdesk')}}"><button class="btn-show-contact1000">
+				  Start/Stop
+				</button>
+			</div>
+
+			<div style="margin: 25px">
+				<a href="{{url_for('manageacc')}}"><button class="btn-show-contact1000">
+				  Manage Account
+				</button>
+			</div>
+				
+			<div style="margin: 25px">
+					<a href="{{ url_for('logout') }}"><button class="btn-show-contact1000">
+				  Log Out
+				</button>
+				</div>
+			</fieldset>
+{% endblock content %}

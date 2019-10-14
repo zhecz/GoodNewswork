@@ -2,3 +2,8 @@ Gmail/elephantSQL
 id: goodnewspartners1@gmail.com
 password:goodnews24
 
+Azure
+
+servername: goodnewswork
+admin login: goodnews24
+password: gnp7737644998!

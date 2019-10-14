@@ -50,8 +50,24 @@
                     {% else %}
                         {{ form.password(class="form-control form-control-lg") }}
                     {% endif %}
-                </div>
+                
                 </div></li>
+                
+                 <li><div class="form-group">
+                    <font color="#fff"> {{ form.email.label(class="form-control-label") }}</font>
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                    </div>
+                </div></li>
+                
                 </ul>
                 </fieldset>
                 <fieldset>
@@ -101,29 +117,29 @@
                     {% endif %}
                 </div></li>
                 
+            
+             <li><div class="form-group">
+                <font color="#fff"> {{ form.position.label(class="form-control-label") }}</font>
+                {% if form.position.errors %}
+                    {{ form.position(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.position.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.position(class="form-control form-control-lg") }}
+                {% endif %}
+                </div>
+            </div></li>
+                
          </ul>
          </fieldset>
-         <ul>
-         <fieldset>
-      
-                </fieldset>
-                </ul>
+        
          <ul>
          </div>
          <fieldset>
-              <li><div class="form-group">
-                    <font color="#fff"> {{ form.email.label(class="form-control-label") }}</font>
-                    {% if form.email.errors %}
-                        {{ form.email(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.email.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.email(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div></li>
+             
             <div class="form-group">
                <center> {{ form.submit(class="btn btn-outline-info") }}</center>
             </div>

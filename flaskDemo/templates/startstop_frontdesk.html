@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block content %}
+<div style="margin-top:-140px;">
+<div class="contact100-home">
+	<div style="margin-right: 30px; margin-top:20px; margin-bottom: 30px;">
+				<a href="{{ url_for('start_frontdesk') }}"><button class="btn-show-contact100">
+				  Start
+				  </button>
+				</a>
+			</div>
+			
+			<div style="margin-right: 30px; margin-top:20px; margin-bottom: 30px;">
+					<a href="{{ url_for('stop_frontdesk') }}">
+				<button class="btn-show-contact100">
+				  Stop
+				</button>
+			</div>
+		</div>
+			</div>
+{% endblock content %}

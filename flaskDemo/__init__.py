@@ -9,8 +9,10 @@ from flask_principal import identity_loaded, RoleNeed, UserNeed
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'KdwslCx7DZ72Nk_IpvSA1M8IJC1Gk67J'
-app.config['SQLALCHEMY_DATABASE_URI'] ='postgres://hwhmmhsr:KdwslCx7DZ72Nk_IpvSA1M8IJC1Gk67J@salt.db.elephantsql.com:5432/hwhmmhsr'#'postgres://xxfdqbgu:0-u_otmPgc2alndmeH-6lFtMuln1dj8i@salt.db.elephantsql.com:5432/xxfdqbgu'
-#app.config['SQLALCHEMY_DATABASE_URI'] ='mysql://root:@127.0.0.1/ecommerce'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 
+#app.config['SQLALCHEMY_DATABASE_URI'] ='postgres://xxfdqbgu:0-u_otmPgc2alndmeH-6lFtMuln1dj8i@salt.db.elephantsql.com:5432/xxfdqbgu'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://hwhmmhsr:KdwslCx7DZ72Nk_IpvSA1M8IJC1Gk67J@salt.db.elephantsql.com:5432/hwhmmhsr'
+
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -33,7 +35,7 @@ def on_identity_loaded(sender, identity):
     identity.user = current_user
 
     # Add the UserNeed to the identity
-    if hasattr(current_user, 'userID'):
-        identity.provides.add(UserNeed(current_user.userID))
+    if hasattr(current_user, 'roleID'):
+        identity.provides.add(RoleNeed(current_user.roleID))
 
     
