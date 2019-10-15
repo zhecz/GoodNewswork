@@ -266,7 +266,7 @@ def start_frontdesk():
     code = work.query.filter(work.employeeID == current_user.employeeID,work.endTimeAuto == None, work.endTimeManual == None).first()
     if code:
         limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
-        if((datetime.now()-code.startTimeAuto)>limit) or ((datetime.now()-code.startTimeManual)>limit):
+        if((datetime.now()-code.startTimeAuto)>limit):
             code.endTimeAuto = datetime(9999,1,1,1,1,1)
             code.endTimeManual = datetime(9999,1,1,1,1,1)
             db.session.commit()
@@ -487,7 +487,7 @@ def stop(worktype):
             code.endTimeAuto = datetime(9999,1,1,1,1,1)
             code.endTimeManual = datetime(9999,1,1,1,1,1)
             db.session.commit()
-            flash("Start time exceeds 24 hours, please contact Ken/Brandon to adjust previous work","danger")
+            flash("Start time exceeds 24 hours from current time, please contact Ken/Brandon to adjust previous work","danger")
             return render_template('choices.html')
     if worktype=="maintainence":
         maintcode = work.query.filter_by(employeeID = current_user.employeeID,workType = "maintainence",endTimeAuto = None, endTimeManual = None)
@@ -516,9 +516,13 @@ def stop(worktype):
 def maintainence(workorder):
     form = MaintenanceForm()
     if form.validate_on_submit():
+         limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
          Work = work.query.filter(work.workOrdernumber==workorder).first()
          if(form.endTime.data < Work.startTimeManual):
              flash("End Date is earlier than Start Date, invalid","danger")
+             return redirect(url_for('maintainence',workorder=workorder))
+         elif((Work.startTimeManual - form.endTime.data)>limit):
+             flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('maintainence',workorder=workorder))
          Work.endTimeManual=form.endTime.data
          Work.endTimeAuto=datetime.now()
@@ -539,8 +543,12 @@ def apartmentrehabs(workorder):
     form = ApartmentRehabForm()
     if form.validate_on_submit():
          Work = work.query.filter(work.workOrdernumber==workorder).first()
+         limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
          if(form.endTime.data < Work.startTimeManual):
              flash("End Date is earlier than Start Date, invalid","danger")
+             return redirect(url_for('apartmentrehabs',workorder=workorder))
+         elif((Work.startTimeManual - form.endTime.data)>limit):
+             flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('apartmentrehabs',workorder=workorder))
          Work.endTimeManual=form.endTime.data
          Work.endTimeAuto=datetime.now()
@@ -560,8 +568,12 @@ def otherss(workorder):
     form = OtherForm()
     if form.validate_on_submit():
          Work = work.query.filter(work.workOrdernumber==workorder).first()
+         limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
          if(form.endTime.data < Work.startTimeManual):
              flash("End Date is earlier than Start Date, invalid","danger")
+             return redirect(url_for('otherss',workorder = workorder))
+         elif((Work.startTimeManual - form.endTime.data)>limit):
+             flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('otherss',workorder = workorder))
          Work.endTimeManual=form.endTime.data
          Work.endTimeAuto=datetime.now()
@@ -579,8 +591,12 @@ def land_scaping(workorder):
     form = LandscapingForm()
     if form.validate_on_submit():
         Work = work.query.filter(work.workOrdernumber==workorder).first()
+        limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
         if(form.endTime.data < Work.startTimeManual):
              flash("End Date is earlier than Start Date, invalid","danger")
+             return redirect(url_for('land_scaping',workorder=workorder))
+        elif((Work.startTimeManual - form.endTime.data)>limit):
+             flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('land_scaping',workorder=workorder))
         Work.endTimeManual=form.endTime.data
         Work.endTimeAuto=datetime.now()        
@@ -599,8 +615,12 @@ def pest_control(workorder):
     form = PestControlForm()
     if form.validate_on_submit():
          Work = work.query.filter(work.workOrdernumber==workorder).first()
+         limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
          if(form.endTime.data < Work.startTimeManual):
              flash("End Date is earlier than Start Date, invalid","danger")
+             return redirect(url_for('pest_control'))
+         elif((Work.startTimeManual - form.endTime.data)>limit):
+             flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('pest_control'))
          Work.endTimeManual=form.endTime.data
          Work.endTimeAuto=datetime.now()                 

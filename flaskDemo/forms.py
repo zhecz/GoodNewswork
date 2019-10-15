@@ -7,7 +7,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flaskDemo import db
 from flaskDemo.models import employee, building,work,maintenance,apartmentrehab,landscaping,pestcontrol
 from wtforms.fields.html5 import DateTimeLocalField
-from datetime import datetime
+from datetime import datetime,timedelta
 
 class BuildingForm(FlaskForm):
     buildingName = SelectField('Select Building',coerce=int,validators=[DataRequired()])
@@ -110,16 +110,20 @@ class StartForm(FlaskForm):
     submit = SubmitField("Start")
     
     def validate_startTime(self, startTime):
+        limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
         if (startTime.data > datetime.now()):
             raise ValidationError("Start Date is in the future, invalid")
+        elif ((datetime.now()-startTime.data)>limit):
+            raise ValidationError("Start Date exceeds 24hours from the current time, invalid")
+
             
-class StartNonUnitForm(FlaskForm):
-    startTime =  DateTimeLocalField('Start Time',validators=[InputRequired()],format='%Y-%m-%dT%H:%M')
-    submit = SubmitField("Start")
-    
-    def validate_startTime(self, startTime):
-        if (startTime.data > datetime.now()):
-            raise ValidationError("Start Date is in the future, invalid")
+#class StartNonUnitForm(FlaskForm):
+#    startTime =  DateTimeLocalField('Start Time',validators=[InputRequired()],format='%Y-%m-%dT%H:%M')
+#    submit = SubmitField("Start")
+#    
+#    def validate_startTime(self, startTime):
+#        if (startTime.data > datetime.now()):
+#            raise ValidationError("Start Date is in the future, invalid")
 
 
 class MaintenanceForm(FlaskForm):
@@ -133,23 +137,13 @@ class MaintenanceForm(FlaskForm):
     description =  StringField('Description',validators=[DataRequired()])
     picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Submit')
-    
-    def validate_workOrdernumber(self,workOrdernumber):
-        Work = work.query.filter_by(workOrdernumber=workOrdernumber.data).first()
-        if Work==None:
-             raise ValidationError('Work Order Number not found')
-       
-            
+   
     def validate_endTime(self,endTime):
         if (endTime.data > datetime.now()):
             raise ValidationError("End Date is in the future, invalid")
              
              
              
-             
-    
-    
-    
 class ApartmentRehabForm(FlaskForm):
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     apartreh = [('Bathroom','Bathroom'),('Painting','Painting'),('Plumbing','Plumbing'),('Sanding','Sanding'),('Gas','Gas'),('Remove Garbage','Remove Garbage'),('Electrical','Electrical'),('Others','Others')]
@@ -158,16 +152,12 @@ class ApartmentRehabForm(FlaskForm):
     description =  StringField('Description',validators=[DataRequired()])
     picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Submit')
-    
-    def validate_workOrdernumber(self,workOrdernumber):
-        Work = work.query.filter_by(workOrdernumber=workOrdernumber.data).first()
-        if Work==None:
-             raise ValidationError('Work Order Number not found')
-       
-            
+
     def validate_endTime(self,endTime):
         if (endTime.data > datetime.now()):
             raise ValidationError("End Date is in the future, invalid")
+
+
 
 class LandscapingForm(FlaskForm):
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
@@ -175,32 +165,25 @@ class LandscapingForm(FlaskForm):
     description =  StringField('Description',validators=[DataRequired()])
     picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
     submit = SubmitField('Submit')
-    
-    def validate_workOrdernumber(self,workOrdernumber):
-        Work = work.query.filter_by(workOrdernumber=workOrdernumber.data).first()
-        if Work==None:
-             raise ValidationError('Work Order Number not found')
-       
-            
+   
     def validate_endTime(self,endTime):
         if (endTime.data > datetime.now()):
             raise ValidationError("End Date is in the future, invalid")
+
+
+
 
 class PestControlForm(FlaskForm):
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     description =  StringField('Description',validators=[DataRequired()])
     picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
     submit = SubmitField('Submit')
-    
-    def validate_workOrdernumber(self,workOrdernumber):
-        Work = work.query.filter_by(workOrdernumber=workOrdernumber.data).first()
-        if Work==None:
-             raise ValidationError('Work Order Number not found')
-       
-            
+
     def validate_endTime(self,endTime):
         if (endTime.data > datetime.now()):
             raise ValidationError("End Date is in the future, invalid")
+
+
 
 class OtherForm(FlaskForm):
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
@@ -210,13 +193,7 @@ class OtherForm(FlaskForm):
     description =  StringField('Description',validators=[DataRequired()])
     picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
     submit = SubmitField('Submit')
-    
-    def validate_workOrdernumber(self,workOrdernumber):
-        Work = work.query.filter_by(workOrdernumber=workOrdernumber.data).first()
-        if Work==None:
-             raise ValidationError('Work Order Number not found')
-       
-            
+      
     def validate_endTime(self,endTime):
         if (endTime.data > datetime.now()):
             raise ValidationError("End Date is in the future, invalid")
