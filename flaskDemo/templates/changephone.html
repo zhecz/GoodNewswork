@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+  {% block content %}
+  <div class="row" style="margin-top:100px">
+
+
+
+    <div style=" justify-content: center;">
+    
+   
+    <div style= "display: flex;">
+
+   
+  
+ 
+      <fieldset>
+               
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <center> <legend style="color: #fff" >Change Password</legend></center>
+           
+              <div style="margin: 10px;">
+                <ul>
+                 <li><div class="form-group">
+                    <font color="#fff">{{ form. oldphone.label(class="form-control-label") }}</font>
+
+                    {% if form. oldphone.errors %}
+                        {{ form. oldphone(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form. oldphone.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form. oldphone(class="form-control form-control-lg") }}
+                    {% endif %}
+                </li>
+                <ul>
+                 
+                <li><div class="form-group">
+                    <font color="#fff"> {{ form.newphone.label(class="form-control-label") }}</font>
+                    {% if form.newphone.errors %}
+                        {{ form.newphone(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.newphone.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.newphone(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div></li>
+                <li>
+                
+                   <li><div class="form-group">
+                    <font color="#fff"> {{ form.confirmphone.label(class="form-control-label") }}</font>
+                    {% if form.confirmphone.errors %}
+                        {{ form.confirmphone(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirmphone.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.confirmphone(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div></li>
+                <li>
+              
+               
+                  <div class="form-group">
+               <center> {{ form.submit(class="btn-show-contact10") }}</center>
+            
+            </small>
+            </div>
+            
+             
+            
+            
+                
+         </ul>
+         
+         </fieldset>
+         </div>
+         <ul>
+         
+        
+    
+           
+            </ul>
+               
+        </form>
+
+					<center><a href="{{ url_for('manageacc') }}"><button class="btn-show-contact10">
+				  Back
+				</button></center>
+        
+    </div>
+   
+    </div>
+    
+{% endblock content %}

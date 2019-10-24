@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+  {% block content %}
+  	
+  	 {% for work in works %}
+  	
+		<div class="container-table100">
+			<div class="wrap-table100">
+				<div class="table100">
+					<table>
+						<thead>
+							<tr class="table100-head">
+								<th class="column1">Work Order Number</th>
+								<th class="column2">Building</th>
+								<th class="column3">Unit</th>
+								<th class="column4">Start Time</th>
+							</tr>
+						</thead>
+							<tbody>
+								<tr>
+									<td class="column1">{{ work.workOrdernumber }}</td>
+									<td class="column2">{{ work.buildingID }}</td>
+									<td class="column3">{{ work.unitID }}</td>
+									<td class="column4">{{ work.startTimeManual }}</td>
+								</tr>
+						</tbody>
+					</table>
+					<center><a href="{{ url_for('maintainence', workorder=work.workOrdernumber) }}"><button class="btn-show-contact10" style="margin-top:10px">
+				  Stop
+				</button></center>
+				</div>
+			</div>
+		</div>
+	
+	
+
+
+ {% endfor %}
+ 
+ 	<div style="margin: 25px">
+				<center>	<a href="{{ url_for('front') }}"><button class="btn-show-contact10">
+				  Back
+				</button></center>
+				</div>
+
+              
+    
+{% endblock content %}
