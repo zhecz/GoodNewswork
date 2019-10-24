@@ -320,7 +320,7 @@ def front(): #render frontpage buttons
     elif Employee.roleID == 2:
         return render_template('frontpage-frontdesk.html')
     elif Employee.roleID == 3:
-        return redirect('/admin')
+        return redirect(url_for('admin_front'))
 
 
 
@@ -762,6 +762,7 @@ def pest_control(workorder):
 
 @app.route("/admin_front",methods=['GET', 'POST'])
 @login_required
+@admin_permission.require(http_exception=403)
 def admin_front():
     return redirect('/admin')
 
@@ -858,10 +859,16 @@ class ModelView_employee(ModelView):
 class WorkView_logout(BaseView):
     @expose('/')
     def index(self):
-        return self.render('admin_logout.html')
+        return redirect(url_for('logout'))
 
+class ModelView_unit(ModelView):
+    def is_accessible(self):
+        return (current_user.is_authenticated and current_user.roleID ==3)
+        
+    column_list = ('unitID', 'unitName', 'building') 
 
 admin.add_view(ModelView_building(building,db.session))  
+admin.add_view(ModelView(unit,db.session, name='Unit'))
 admin.add_view(ModelView_employee(employee,db.session))
 admin.add_view(WorkView(name='Work', endpoint='work'))
 admin.add_view(WorkView_logout(name="Logout", endpoint='logout'))
