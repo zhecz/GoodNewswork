@@ -763,28 +763,28 @@ textarea.input100 {
 }
 
 table.blueTable {
-  background-color: #FFD700;
+  background-color: #FFFFFF;
   width: 100%;
   text-align: center;
 }
 table.blueTable td, table.blueTable th {
-  border: 1px solid #AAAAAA;
+  border: 1px solid #ffffff;
   padding: 3px 1px;
 }
 table.blueTable tbody td {
   font-size: 14px;
   font-weight: bold;
-  color: #FFFFFF;
+  color: #000000;
 }
 table.blueTable tr:nth-child(even) {
-  background: #FFD700;
+  background: #FFFFFF;
 }
 table.blueTable thead {
   background: #FFB347;
   background: -moz-linear-gradient(top, #ffc675 0%, #ffba59 66%, #FFB347 100%);
   background: -webkit-linear-gradient(top, #ffc675 0%, #ffba59 66%, #FFB347 100%);
   background: linear-gradient(to bottom, #ffc675 0%, #ffba59 66%, #FFB347 100%);
-  border-bottom: 2px solid #444444;
+  border-bottom: 2px solid #000000;
 }
 table.blueTable thead th {
   font-size: 15px;

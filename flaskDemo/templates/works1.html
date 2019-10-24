@@ -1,4 +1,16 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
+ {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+              	
+                <div class="alert alert-{{ category }}" style="margin-bottom:0px"> <font size="1em">
+                  <span id='close'>x</span>
+                  {{ message }}</font>
+                </div>
+            
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
 
 
 
@@ -53,6 +65,12 @@
     <div style="margin: 25px">
 				<center>	<a href="{{ url_for('admin_front') }}"><button class="btn-show-contact10">
 				  Back
+				</button></center>
+				</div>
+				
+    <div style="margin: 25px">
+				<center>	<a href="{{ url_for('exporttocsv') }}"><button class="btn-show-contact10">
+				  Export
 				</button></center>
 				</div>
 
