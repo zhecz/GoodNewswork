@@ -3,8 +3,9 @@
  
  <div style=" justify-content: center; display: flex;">
  <fieldset>
-  <form method="POST">
+  <form method="POST" action="" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
+              
                     
                      <div style="margin: 10px;">
                     <li><div class="form-group">
@@ -25,19 +26,33 @@
                      
                      <div style="margin: 10px;">
                     <li><div class="form-group">
-                     <font color="#fff"> {{ form.landscapingType.label(class="form-control-label") }}</font>
-                    {% if form.landscapingType.errors %}
-                        {{ form.landscapingType(class="form-control form-control-lg is-invalid") }}
+                     <font color="#fff"> {{ form.othersType.label(class="form-control-label") }}</font>
+                    {% if form.othersType.errors %}
+                        {{ form.othersType(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.landscapingType.errors %}
+                            {% for error in form.othersType.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.landscapingType(class="form-control form-control-lg") }}
+                        {{ form.othersType(class="form-control form-control-lg") }}
                     {% endif %}
                 </div> </div></li>
                 
+                     <div style="margin: 10px;">
+                    <li><div class="form-group">
+                     <font color="#fff"> {{ form.other.label(class="form-control-label") }}</font>
+                    {% if form.other.errors %}
+                        {{ form.other(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.other.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.other(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div> </div></li>
                 
                    <div style="margin: 10px;">
                     <li><div class="form-group">
@@ -54,20 +69,18 @@
                     {% endif %}
                 </div> </div></li>
                 
-                                  <div style="margin: 10px;">
-                    <li><div class="form-group">
-                     <font color="#fff"> {{ form.picture.label(class="form-control-label") }}</font>
+                                 <div style="margin: 10px;">   <li>   
+                    <div class="form-group">
+                    <font color="#fff"> {{ form.picture.label() }}</font>
+                     <center> <font color="#fff">  {{ form.picture(class="form-control-file") }}</font></center>
                     {% if form.picture.errors %}
-                        {{ form.picture(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.picture.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.picture(class="form-control form-control-lg") }}
+                        {% for error in form.picture.errors %}
+                            <span class="text-danger">{{ error }}</span></br>
+                        {% endfor %}
                     {% endif %}
-                </div> </div></li>
+                    
+                </div>
+                </li></div>
                 
                 
                 

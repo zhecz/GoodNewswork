@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.file import FileField, FileAllowed,FileRequired
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, IntegerField, DateField, SelectField, HiddenField, FieldList, FormField
 from wtforms.validators import InputRequired,DataRequired, Length, Email, EqualTo, ValidationError,Regexp
@@ -13,7 +13,7 @@ class BuildingForm(FlaskForm):
     buildingName = SelectField('Select Building',coerce=int,validators=[DataRequired()])
     submit = SubmitField('Select')
     
-class ForgetPasswordForm (FlaskForm):
+class ForgetForm (FlaskForm):
     email = StringField('Your email:',  validators= [DataRequired(),Email()])
     submit = SubmitField('Verify')    
     
@@ -135,7 +135,7 @@ class MaintenanceForm(FlaskForm):
     time = [('Yearly Maintenance', 'Yearly Maintenance'),('Work Order Maintenance', 'Work Order Maintenance')]
     yearOrworkOrder =SelectField('Yearly/Usual Maintenance', choices=time,validators=[DataRequired()])
     description =  StringField('Description',validators=[DataRequired()])
-    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png'])])
+    picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
     submit = SubmitField('Submit')
    
     def validate_endTime(self,endTime):
@@ -150,7 +150,7 @@ class ApartmentRehabForm(FlaskForm):
     rehabType = SelectField('Rehabilitation Type', choices=apartreh,validators=[DataRequired()])
     others = StringField('If Others,please state:')
     description =  StringField('Description',validators=[DataRequired()])
-    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png'])])
+    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
     submit = SubmitField('Submit')
 
     def validate_endTime(self,endTime):
@@ -163,7 +163,7 @@ class LandscapingForm(FlaskForm):
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     landscapingType = StringField('Landscaping type',validators=[DataRequired()])
     description =  StringField('Description',validators=[DataRequired()])
-    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
+    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
     submit = SubmitField('Submit')
    
     def validate_endTime(self,endTime):
@@ -176,7 +176,7 @@ class LandscapingForm(FlaskForm):
 class PestControlForm(FlaskForm):
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     description =  StringField('Description',validators=[DataRequired()])
-    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
+    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
     submit = SubmitField('Submit')
 
     def validate_endTime(self,endTime):
@@ -191,7 +191,7 @@ class OtherForm(FlaskForm):
     othersType = SelectField("Other Categories",choices = otherchoice,validators=[DataRequired()])
     other = StringField('if others please state:')
     description =  StringField('Description',validators=[DataRequired()])
-    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
+    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
     submit = SubmitField('Submit')
       
     def validate_endTime(self,endTime):
