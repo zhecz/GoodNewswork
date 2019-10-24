@@ -21,6 +21,11 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import flaskDemo.authorize as authorize
 
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+from flask_admin import BaseView, expose
+from pandas import DataFrame
+
 
 import httplib2
 import os, io
@@ -48,10 +53,12 @@ http = credentials.authorize(httplib2.Http())
 drive_service = discovery.build('drive', 'v3', http=http)
 
 
-#admin_permission = Permission(RoleNeed(2))
+admin_permission = Permission(RoleNeed('admin'))
+admin=Admin(app)
 
 maintainence_permission = Permission(RoleNeed(1))
 frontdesk_permission = Permission(RoleNeed(2))
+admin_permission = Permission(RoleNeed(3))
 
 #Configure db
 #Methods created 
@@ -312,6 +319,8 @@ def front(): #render frontpage buttons
         return render_template('frontpage-maintainence.html')
     elif Employee.roleID == 2:
         return render_template('frontpage-frontdesk.html')
+    elif Employee.roleID == 3:
+        return redirect('/admin')
 
 
 #frontdesk app form
@@ -747,4 +756,71 @@ def pest_control(workorder):
  
 
 
+class WorkView(BaseView):
+    @expose('/')
+    
+    
 
+    def index(self):
+       # works=work.query.join(employee,employee.employeeID==work.employeeID)\
+           # .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
+               # work.startTimeAuto,\
+                    #work.endTimeAuto, work.startTimeManual, work.endTimeManual).\
+                       # group_by(employee.employeeID).all()
+        works=employee.query.join(work,employee.employeeID==work.employeeID)\
+            .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
+                work.workType, work.endTimeAuto, work.startTimeAuto)\
+                    .join(building, work.buildingID==building.buildingID)\
+                        .add_columns(building.buildingName)\
+               .order_by(employee.employeeID.desc()).all()          
+            
+        #work.query.group_by(work.employeeID).all()               
+        print(works)
+        wholeData=[]
+        for i in works:
+            employeeID=i[1]
+            employeeFirstName=i[2]
+            employeeLastName=i[3]
+            BuildingName=i[8]
+            WorkType=i[5]
+            startTime=i[7]
+            endTime=i[6]
+            timedelta=(i[7]-i[7]).total_seconds()
+            if i[6]:
+                timedelta=(i[6]-i[7]).total_seconds()
+            Hours = timedelta//3600
+            Minutes = (timedelta%3600)//60
+            Seconds = (timedelta%3600)%60
+            wholeData.append([employeeID,employeeFirstName,employeeLastName,BuildingName,WorkType,startTime,endTime,Hours,Minutes,Seconds])
+            print(wholeData)
+
+        matchdataset=pd.DataFrame(wholeData,columns=['employeeID','employeeFirstName','employeeLastName','BuildingName',\
+            'WorkType','StartTime','EndTime','Hours','Minutes','Second'])   
+        matchdataset.to_excel("matchdatasetV5.xlsx",encoding='utf-8')     
+
+        
+        return self.render('works1.html', works=works)
+
+    def is_accessible(self):
+        return (current_user.is_authenticated and current_user.roleID ==3)
+
+
+class ModelView_building(ModelView):
+    def is_accessible(self):
+        return (current_user.is_authenticated and current_user.roleID ==3)
+
+
+class ModelView_employee(ModelView):
+    def is_accessible(self):
+        return (current_user.is_authenticated and current_user.roleID ==3)
+
+class WorkView_logout(BaseView):
+    @expose('/')
+    def index(self):
+        return self.render('admin_logout.html')
+
+
+admin.add_view(ModelView_building(building,db.session))  
+admin.add_view(ModelView_employee(employee,db.session))
+admin.add_view(WorkView(name='Work', endpoint='work'))
+admin.add_view(WorkView_logout(name="Logout", endpoint='logout'))

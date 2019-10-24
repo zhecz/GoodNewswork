@@ -1,0 +1,41 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
+
+
+
+<h1 style="text-align:center;">Work</h1>
+<table class="blueTable">
+    <thead>
+    <tr>
+    <th>EmployeeName</th>
+    <th>Apartment</th>
+    <th>WorkType</th>
+    <th>WorkTime(Auto)</th>
+    <th>WorkTime</th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+    
+    </tr>
+    </tfoot>
+    <tbody>
+            {% for work in works %}   
+    <tr>
+    <td>{{work.employeeID}} {{ work.firstName}} {{ work.lastName}}</td>
+    
+    <td>{{work.buildingName}}</td>
+    
+    <td>{{work.workType}}</td>
+    
+    <td>{{work.startTimeAuto}}</td>
+    
+        <td>{{work.endTimeAuto}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    
+    </table>
+
+
+
+ 
