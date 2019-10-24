@@ -6,11 +6,17 @@
 <table class="blueTable">
     <thead>
     <tr>
+     <th>EmployeeID</th>
     <th>EmployeeName</th>
     <th>Apartment</th>
     <th>WorkType</th>
-    <th>WorkTime(Auto)</th>
-    <th>WorkTime</th>
+    <th>StartTime Auto</th>
+    <th>EndTime Auto</th>
+    <th>StartTime Manual</th>
+    <th>EndTime Manual</th>
+    <th>Hours Work Auto</th>
+    <th>Hours Work Manual</th>
+    
     </tr>
     </thead>
     <tfoot>
@@ -21,7 +27,9 @@
     <tbody>
             {% for work in works %}   
     <tr>
-    <td>{{work.employeeID}} {{ work.firstName}} {{ work.lastName}}</td>
+    <td>{{work.employeeID}} </td>
+    
+    <td>{{ work.firstName}} {{ work.lastName}}</td>
     
     <td>{{work.buildingName}}</td>
     
@@ -30,11 +38,23 @@
     <td>{{work.startTimeAuto}}</td>
     
         <td>{{work.endTimeAuto}}</td>
+        
+        <td>{{work.startTimeManual}}</td>
+    
+        <td>{{work.endTimeManual}}</td>
+        <td>{{work.hours_work_auto}}</td>
+        <td>{{work.hours_work_manual}}</td>
     </tr>
     {% endfor %}
     </tbody>
     
     </table>
+    
+    <div style="margin: 25px">
+				<center>	<a href="{{ url_for('admin_front') }}"><button class="btn-show-contact10">
+				  Back
+				</button></center>
+				</div>
 
 
 

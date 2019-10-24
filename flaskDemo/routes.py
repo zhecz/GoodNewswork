@@ -323,6 +323,11 @@ def front(): #render frontpage buttons
         return redirect('/admin')
 
 
+@app.route("/admin_front",methods=['GET', 'POST'])
+@login_required
+def admin_front():
+    return redirect('/admin')
+
 #frontdesk app form
 # ---------------------------------------------------------------------------------------------------
 
@@ -767,35 +772,45 @@ class WorkView(BaseView):
                # work.startTimeAuto,\
                     #work.endTimeAuto, work.startTimeManual, work.endTimeManual).\
                        # group_by(employee.employeeID).all()
-        works=employee.query.join(work,employee.employeeID==work.employeeID)\
+        works=work.query.join(employee,work.employeeID==employee.employeeID)\
             .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
-                work.workType, work.endTimeAuto, work.startTimeAuto)\
+                work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns((work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
                     .join(building, work.buildingID==building.buildingID)\
                         .add_columns(building.buildingName)\
-               .order_by(employee.employeeID.desc()).all()          
+               .order_by(employee.employeeID.desc()).all()      
+               
+        
             
         #work.query.group_by(work.employeeID).all()               
         print(works)
         wholeData=[]
+        workdata = []
         for i in works:
             employeeID=i[1]
             employeeFirstName=i[2]
             employeeLastName=i[3]
-            BuildingName=i[8]
+            BuildingName=i[10]
             WorkType=i[5]
-            startTime=i[7]
-            endTime=i[6]
-            timedelta=(i[7]-i[7]).total_seconds()
-            if i[6]:
-                timedelta=(i[6]-i[7]).total_seconds()
-            Hours = timedelta//3600
-            Minutes = (timedelta%3600)//60
-            Seconds = (timedelta%3600)%60
-            wholeData.append([employeeID,employeeFirstName,employeeLastName,BuildingName,WorkType,startTime,endTime,Hours,Minutes,Seconds])
-            print(wholeData)
+            startTimeAuto=i[7]
+            endTimeAuto=i[6]
+            startTimeManual=i[9]
+            endTimeManual=i[8]
+            timedeltaAuto=(startTimeAuto-startTimeAuto).total_seconds()
+            timedeltaManual=(startTimeManual-startTimeManual).total_seconds()
+            if i[6] and i[8]:
+                timedeltaAuto=(endTimeAuto-startTimeAuto).total_seconds()
+                timedeltaManual=(endTimeManual-startTimeManual).total_seconds()
+                
+            timediffAuto = timedelta(seconds=timedeltaAuto)
+            timediffManual = timedelta(seconds=timedeltaManual)
+            
+            
+            wholeData.append([employeeID,employeeFirstName,employeeLastName,BuildingName,WorkType,startTimeAuto,endTimeAuto,startTimeManual,endTimeManual,str(timediffAuto),str(timediffManual)])
+            workdata.append(tuple([employeeID,employeeFirstName,employeeLastName,BuildingName,WorkType,startTimeAuto,endTimeAuto,startTimeManual,endTimeManual,str(timediffAuto),str(timediffManual)]))
+            #print(wholeData)
 
         matchdataset=pd.DataFrame(wholeData,columns=['employeeID','employeeFirstName','employeeLastName','BuildingName',\
-            'WorkType','StartTime','EndTime','Hours','Minutes','Second'])   
+            'WorkType','StartTime Auto','EndTime Auto','StartTime Manual','EndTime Manual','HoursWork Auto','HoursWork Manual'])   
         matchdataset.to_excel("matchdatasetV5.xlsx",encoding='utf-8')     
 
         
