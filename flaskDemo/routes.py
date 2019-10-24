@@ -1,40 +1,92 @@
 import os
 import secrets
 import re
+import json
+import requests
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, current_app
 from flaskDemo import app, db, bcrypt
-from flask_login import login_user, current_user, logout_user, login_required, LoginManager
+from flask_login import login_user, current_user, logout_user, login_required
 from flask_principal import Principal, Identity, AnonymousIdentity, identity_changed, Permission, RoleNeed, identity_loaded
 from flaskDemo.models import role,employee, unit,building,work,maintenance,apartmentrehab,others,landscaping,pestcontrol
-from flaskDemo.forms import ChangeEmailForm,ChangePhoneForm,ChangePasswordForm,ForgetPasswordForm,StartForm,BuildingForm,RegistrationForm,LoginForm,MaintenanceForm,ApartmentRehabForm,LandscapingForm,PestControlForm,OtherForm
+from flaskDemo.forms import ChangeEmailForm,ChangePhoneForm,ChangePasswordForm,ForgetForm,StartForm,BuildingForm,RegistrationForm,LoginForm,MaintenanceForm,ApartmentRehabForm,LandscapingForm,PestControlForm,OtherForm
 from datetime import datetime, timedelta
 from sqlalchemy import or_, update, and_
+
 import yaml
 import pandas as pd
 from numpy.random import randint
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import flaskDemo.authorize as authorize
 
-from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
-from flask_admin import BaseView, expose
-from pandas import DataFrame
 
-import pandas as pd
+import httplib2
+import os, io
 
-admin_permission = Permission(RoleNeed('admin'))
-admin=Admin(app)
+from apiclient import discovery
+from oauth2client import client
+from oauth2client import tools
+from oauth2client.file import Storage
+from apiclient.http import MediaFileUpload, MediaIoBaseDownload
+try:
+    import argparse
+    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+except ImportError:
+    flags = None
+
+# If modifying these scopes, delete your previously saved credentials
+# at ~/.credentials/drive-python-quickstart.json
+SCOPES = 'https://www.googleapis.com/auth/drive'
+CLIENT_SECRET_FILE = 'client_secret.json'
+APPLICATION_NAME = 'Drive API Python Quickstart'
+authInst = authorize.auth(SCOPES,CLIENT_SECRET_FILE,APPLICATION_NAME)
+credentials = authInst.getCredentials()
+
+http = credentials.authorize(httplib2.Http())
+drive_service = discovery.build('drive', 'v3', http=http)
 
 
 #admin_permission = Permission(RoleNeed(2))
 
 maintainence_permission = Permission(RoleNeed(1))
 frontdesk_permission = Permission(RoleNeed(2))
-admin_permission = Permission(RoleNeed(3))
 
 #Configure db
+#Methods created 
+# ---------------------------------------------------------------------------------------------------
+   
+#Send email
+def emailsend(subject,emailsender,text):
+    gmail_user = "goodnewspartners1@gmail.com"
+    gmail_password = "goodnews24"
+  
+    
+    message = MIMEMultipart("alternative")
+    message["Subject"] = subject
+    message["From"] = gmail_user
+    message["To"] = emailsender
+    message.attach(MIMEText(text,"plain"))
+    
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login(gmail_user, gmail_password)
+        server.sendmail(gmail_user, emailsender, message.as_string())
+
+
+
+
+
+#def limit():
+#    code = work.query.filter(work.employeeID == current_user.employeeID,work.endTimeAuto == None, work.endTimeManual == None).first()
+#    if code:
+#        limit = timedelta(days = 1, hours = 0,minutes = 0, seconds = 0)
+#        if((datetime.now()-code.startTimeAuto)>limit) or ((datetime.now()-code.startTimeManual)>limit):
+#            code.endTimeAuto = datetime(9999,1,1,1,1,1)
+#            code.endTimeManual = datetime(9999,1,1,1,1,1)
+#            db.session.commit()
+#            flash("Start time exceeds 24 hours, please contact Ken/Brandon to adjust previous work","danger")
 
 @app.route("/")
 
@@ -90,7 +142,10 @@ admin_permission = Permission(RoleNeed(3))
 #
 #  
 #    return redirect(url_for('home'))   
-    
+
+#
+
+
 #Employee manipulation 
 # ---------------------------------------------------------------------------------------------------
 
@@ -116,14 +171,12 @@ def logout():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('choices'))
     form = LoginForm()
     if form.validate_on_submit():
         Employee = employee.query.filter_by(username=form.username.data).first()
         if Employee and bcrypt.check_password_hash(Employee.password, form.password.data):
             login_user(Employee, remember=form.remember.data)
-          
-            
             identity_changed.send(current_app._get_current_object(),
                                   identity=Identity(Employee.employeeID))
             
@@ -153,39 +206,40 @@ def register():
 
 @app.route("/forgotpass", methods=['GET', 'POST'])
 def forgotpass():
-    form = ForgetPasswordForm()
+    form = ForgetForm()
     if form.validate_on_submit():
         num = randint(100000, 999999)
-        
         hashed_password = bcrypt.generate_password_hash(str(num)).decode('utf-8')
         Employee = employee.query.filter_by(email=form.email.data).first()
         Employee.password = hashed_password
         print(num)
         db.session.commit()
         try:
-            gmail_user = "goodnewspartners1@gmail.com"
-            gmail_password = "goodnews24"
-          
-            
-            message = MIMEMultipart("alternative")
-            message["Subject"] = "Good News Partner - Temporary Password"
-            message["From"] = gmail_user
-            message["To"] = form.email.data
-            text=("Hello there,\n Here is your temporary password: \n"+ str(num) +"\n"+
-                  "Please sign in using this temporary password, and modify your password in Manage Account")
-            message.attach(MIMEText(text,"plain"))
-            
-            context = ssl.create_default_context()
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-                server.login(gmail_user, gmail_password)
-                server.sendmail(gmail_user, form.email.data, message.as_string())
+            text = ("Hello there,\n Here is your temporary password: \n"+ str(num) +"\n"+
+          "Please sign in using this temporary password, and modify your password in Manage Account")
+            emailsend("Good News Partner - Temporary Password",form.email.data,text)
             flash("Temporary Password Sent! Please check your email","success")
             return redirect(url_for('login'))
         except:
             flash("Not Successful in sending link","danger")
-        
-         
-    return render_template('forgotpassword.html',form=form)
+    return render_template('forgot.html',form=form)
+
+
+@app.route("/forgotusername", methods=['GET', 'POST'])
+def forgotusername():
+    form = ForgetForm()
+    if form.validate_on_submit():
+        Employee = employee.query.filter_by(email=form.email.data).first()
+        try:
+            text = ("Hello there,\n Here is your username: \n"+ Employee.username +"\n"+
+          "Please sign in using this username")
+            emailsend("Good News Partner - Username Retrieval",form.email.data,text)
+            flash("Username Sent! Please check your email","success")
+            return redirect(url_for('login'))
+        except:
+            flash("Not Successful in sending link","danger")
+    return render_template('forgot.html',form=form)
+
 
 #Manage Account
 # ---------------------------------------------------------------------------------------------------
@@ -258,10 +312,6 @@ def front(): #render frontpage buttons
         return render_template('frontpage-maintainence.html')
     elif Employee.roleID == 2:
         return render_template('frontpage-frontdesk.html')
-    elif Employee.roleID == 3:
-        return redirect('/admin')
-    
-
 
 
 #frontdesk app form
@@ -290,24 +340,21 @@ def start_frontdesk():
         else:
             flash("You have started already, please press stop to finish current work","danger")
             return redirect(url_for('startstop_frontdesk'))
-    Building= building.query.all()
-    buildingList = [(b.buildingID,b.buildingName) for b in Building]
-    form = BuildingForm()
-    form.buildingName.choices = buildingList
-    if form.validate_on_submit():
-        Unit = unit.query.filter(unit.buildingID == form.buildingName.data,unit.unitName == "Others").first()
-        numid = "FDESK10000"
-        fdnum = work.query.filter(work.workType == "frontdesk").order_by(work.workOrdernumber.desc()).first()
-        if fdnum != None:
-            numfd = int( fdnum.workOrdernumber[5:] ) +1
-            numid = "FDESK"+ str(numfd)
-        Work = work(employeeID = current_user.employeeID,workType = "frontdesk",buildingID =form.buildingName.data , unitID = Unit.unitID,workOrdernumber=numid,startTimeAuto=datetime.now(),endTimeAuto = None,startTimeManual = datetime.now(), endTimeManual=None)
-        db.session.add(Work)
-        db.session.commit()
-        flash("successfully started this shift!","success")
-        return redirect(url_for('startstop_frontdesk'))
-    return render_template('buildingchoice-frontdesk.html',form=form)
-
+    
+    Building = building.query.filter(building.buildingName =="Jonquil").first() 
+    Unit = unit.query.filter(unit.buildingID ==Building.buildingID ,unit.unitName == "Others").first()
+    numid = "FDESK10000"
+    fdnum = work.query.filter(work.workType == "frontdesk").order_by(work.workOrdernumber.desc()).first()
+    if fdnum != None:
+        numfd = int( fdnum.workOrdernumber[5:] ) +1
+        numid = "FDESK"+ str(numfd)
+    Work = work(employeeID = current_user.employeeID,workType = "frontdesk",buildingID =Building.buildingID , unitID = Unit.unitID,workOrdernumber=numid,startTimeAuto=datetime.now(),endTimeAuto = None,startTimeManual = datetime.now(), endTimeManual=None)
+    db.session.add(Work)
+    db.session.commit()
+    flash("successfully started this shift!","success")
+    return redirect(url_for('startstop_frontdesk'))
+   
+    
 @app.route("/stop_F", methods=['GET', 'POST'])
 @login_required #render start and stop buttons
 @frontdesk_permission.require(http_exception=403)
@@ -338,7 +385,7 @@ def stop_frontdesk():
 # ---------------------------------------------------------------------------------------------------
 
 @app.route("/choices", methods=['GET', 'POST'])
-#@maintainence_permission.require(http_exception=403)
+@maintainence_permission.require(http_exception=403)
 @login_required
 def choices(): #render worktype buttons
     return render_template('choices.html')
@@ -368,8 +415,8 @@ def buildingchoice(worktype):
             return render_template('choices.html')
         else:
             flash("There is still ongoing work, please stop your current work before proceeding","danger")
-            return redirect(url_for('stop',worktype=worktype))
-    Building= building.query.all()
+            return redirect(url_for('stop',worktype=code.workType))
+    Building= building.query.order_by(building.buildingName.asc()).all()
     buildingList = [(b.buildingID,b.buildingName) for b in Building]
     form = BuildingForm()
     form.buildingName.choices = buildingList
@@ -524,6 +571,31 @@ def stop(worktype):
          othrcode = work.query.filter_by(employeeID = current_user.employeeID,workType = "others",endTimeAuto = None, endTimeManual = None)
          return render_template("othrtable.html",works = othrcode)
 
+def uploadFile(filename,filepath,mimetype):
+    file_metadata = {'name': filename}
+    media = MediaFileUpload(filepath,
+                            mimetype=mimetype)
+    file = drive_service.files().create(body=file_metadata,
+                                        media_body=media,
+                                        fields='id').execute()
+    print('File ID: %s' % file.get('id'))
+
+
+def save_picture(form_picture,picturename):
+    
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = picturename + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+
+    output_size = (400, 400)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+    
+    uploadFile(picture_fn,'flaskDemo/static/profile_pics/'+picture_fn,'image/'+f_ext)
+   
+
+    return picture_fn
 
 @app.route("/maintainence/<string:workorder>", methods=['GET', 'POST'])
 @login_required
@@ -539,9 +611,15 @@ def maintainence(workorder):
          elif((Work.startTimeManual - form.endTime.data)>limit):
              flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('maintainence',workorder=workorder))
+         image_file = "None"
+         if form.picture.data:
+             picture_file = save_picture(form.picture.data,Work.workOrdernumber)
+             image_file = url_for('static', filename='profile_pics/' + picture_file) 
+             
+        
          Work.endTimeManual=form.endTime.data
          Work.endTimeAuto=datetime.now()
-         maint = maintenance(workID = Work.workID,maintenanceType=form.maintenanceType.data,yearOrworkOrder=form.yearOrworkOrder.data,description = form.description.data,picture = form.picture.data)
+         maint = maintenance(workID = Work.workID,maintenanceType=form.maintenanceType.data,yearOrworkOrder=form.yearOrworkOrder.data,description = form.description.data,picture = image_file)
          db.session.add(maint)
          db.session.commit()
          flash('Form has been successfully submitted','success')
@@ -565,9 +643,14 @@ def apartmentrehabs(workorder):
          elif((Work.startTimeManual - form.endTime.data)>limit):
              flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('apartmentrehabs',workorder=workorder))
+         image_file = "None"
+         if form.picture.data:
+             picture_file = save_picture(form.picture.data,Work.workOrdernumber)
+             image_file = url_for('static', filename='profile_pics/' + picture_file) 
+             
          Work.endTimeManual=form.endTime.data
          Work.endTimeAuto=datetime.now()
-         rehab = apartmentrehab(workID = Work.workID,rehabType=form.rehabType.data,others = form.others.data,description = form.description.data,picture = form.picture.data)
+         rehab = apartmentrehab(workID = Work.workID,rehabType=form.rehabType.data,others = form.others.data,description = form.description.data,picture = image_file)
          db.session.add(rehab)
          db.session.commit()
          flash('Form has been successfully submitted','success')
@@ -590,9 +673,14 @@ def otherss(workorder):
          elif((Work.startTimeManual - form.endTime.data)>limit):
              flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('otherss',workorder = workorder))
+         image_file = "None"
+         if form.picture.data:
+             picture_file = save_picture(form.picture.data,Work.workOrdernumber)
+             image_file = url_for('static', filename='profile_pics/' + picture_file) 
+             
          Work.endTimeManual=form.endTime.data
          Work.endTimeAuto=datetime.now()
-         other = others(workID = Work.workID,othersType=form.othersType.data,others=form.other.data,description = form.description.data,picture = form.picture.data)
+         other = others(workID = Work.workID,othersType=form.othersType.data,others=form.other.data,description = form.description.data,picture = image_file)
          db.session.add(other)
          db.session.commit()
          flash('Form has been successfully submitted','success')
@@ -613,9 +701,14 @@ def land_scaping(workorder):
         elif((Work.startTimeManual - form.endTime.data)>limit):
              flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('land_scaping',workorder=workorder))
+        image_file = "None"
+        if form.picture.data:
+             picture_file = save_picture(form.picture.data,Work.workOrdernumber)
+             image_file = url_for('static', filename='profile_pics/' + picture_file) 
+             
         Work.endTimeManual=form.endTime.data
         Work.endTimeAuto=datetime.now()        
-        landscape = landscaping(workID = Work.workID,landscapingType=form.landscapingType.data,description = form.description.data,picture = form.picture.data)
+        landscape = landscaping(workID = Work.workID,landscapingType=form.landscapingType.data,description = form.description.data,picture = image_file)
         db.session.add(landscape)
         db.session.commit()
         flash('Form has been successfully submitted','success')
@@ -637,9 +730,14 @@ def pest_control(workorder):
          elif((Work.startTimeManual - form.endTime.data)>limit):
              flash("Gap between Start Time and End Time exceeds 24 hours, invalid","danger")
              return redirect(url_for('pest_control'))
+         image_file = "None"
+         if form.picture.data:
+             picture_file = save_picture(form.picture.data,Work.workOrdernumber)
+             image_file = url_for('static', filename='profile_pics/' + picture_file) 
+             
          Work.endTimeManual=form.endTime.data
          Work.endTimeAuto=datetime.now()                 
-         pest = pestcontrol(workID = Work.workID,description = form.description.data,picture = form.picture.data)
+         pest = pestcontrol(workID = Work.workID,description = form.description.data,picture = image_file)
          db.session.add(pest)
          db.session.commit()
          flash('Form has been successfully submitted','success')
@@ -648,71 +746,5 @@ def pest_control(workorder):
     return render_template('pestcontrol.html', title='Pest Control', form=form)
  
 
-class WorkView(BaseView):
-    @expose('/')
-    
-    
 
-    def index(self):
-       # works=work.query.join(employee,employee.employeeID==work.employeeID)\
-           # .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
-               # work.startTimeAuto,\
-                    #work.endTimeAuto, work.startTimeManual, work.endTimeManual).\
-                       # group_by(employee.employeeID).all()
-        works=employee.query.join(work,employee.employeeID==work.employeeID)\
-            .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
-                work.workType, work.endTimeAuto, work.startTimeAuto)\
-                    .join(building, work.buildingID==building.buildingID)\
-                        .add_columns(building.buildingName)\
-               .order_by(employee.employeeID.desc()).all()          
-            
-        #work.query.group_by(work.employeeID).all()               
-        print(works)
-        wholeData=[]
-        for i in works:
-            employeeID=i[1]
-            employeeFirstName=i[2]
-            employeeLastName=i[3]
-            BuildingName=i[8]
-            WorkType=i[5]
-            startTime=i[7]
-            endTime=i[6]
-            timedelta=(i[6]-i[7]).total_seconds()
-            Hours = timedelta//3600
-            Minutes = (timedelta%3600)//60
-            Seconds = (timedelta%3600)%60
-            wholeData.append([employeeID,employeeFirstName,employeeLastName,BuildingName,WorkType,startTime,endTime,Hours,Minutes,Seconds])
-            print(wholeData)
-
-        matchdataset=pd.DataFrame(wholeData,columns=['employeeID','employeeFirstName','employeeLastName','BuildingName',\
-            'WorkType','StartTime','EndTime','Hours','Minutes','Second'])   
-        matchdataset.to_excel("matchdatasetV5.xlsx",encoding='utf-8')     
-
-        
-        return self.render('works1.html', works=works)
-
-    def is_accessible(self):
-        return (current_user.is_authenticated and current_user.roleID ==3)
-
-
-class ModelView_building(ModelView):
-    def is_accessible(self):
-        return (current_user.is_authenticated and current_user.roleID ==3)
-
-
-class ModelView_employee(ModelView):
-    def is_accessible(self):
-        return (current_user.is_authenticated and current_user.roleID ==3)
-
-class WorkView_logout(BaseView):
-    @expose('/')
-    def index(self):
-        return self.render('admin_logout.html')
-
-
-admin.add_view(ModelView_building(building,db.session))  
-admin.add_view(ModelView_employee(employee,db.session))
-admin.add_view(WorkView(name='Work', endpoint='work'))
-admin.add_view(WorkView_logout(name="Logout", endpoint='logout'))
-#admin.add_view(ModelView(work,db.session))
 
