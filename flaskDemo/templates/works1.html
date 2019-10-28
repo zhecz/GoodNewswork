@@ -56,6 +56,7 @@
         <td>{{work.endTimeManual}}</td>
         <td>{{work.hours_work_auto}}</td>
         <td>{{work.hours_work_manual}}</td>
+        <td><a href="{{ url_for('change_endtime',worknumber=work.workOrdernumber) }}">Change end time</a></td>
     </tr>
     {% endfor %}
     </tbody>

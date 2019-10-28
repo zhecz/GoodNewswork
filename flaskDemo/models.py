@@ -45,6 +45,13 @@ class building(db.Model, UserMixin):
     buildingAddress = db.Column(db.String(200), nullable=False)
     postalCode = db.Column(db.Integer, nullable=False)
     numberOfrooms = db.Column(db.Integer, nullable=False)
+    units=db.relationship('unit',backref='building')
+
+    def get_id(self): 
+        return (self.buildingID)
+
+    def __str__(self):
+        return self.buildingName  
 
 
 
@@ -54,7 +61,9 @@ class unit(db.Model, UserMixin):
     buildingID = db.Column(db.Integer,db.ForeignKey('Building.buildingID'), nullable=False)
     unitID = db.Column(db.Integer,primary_key=True)
     unitName = db.Column(db.String(200), nullable=False)
-   
+    
+    def get_id(self): 
+        return (self.unitID)
 
 
 

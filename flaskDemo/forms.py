@@ -21,7 +21,11 @@ class ForgetForm (FlaskForm):
         user = employee.query.filter_by(email=email.data).first()
         if user is None:
             raise ValidationError('Email not found in database')
-            
+
+
+class EndTimeChangeForm(FlaskForm):
+    endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
+    submit = SubmitField('Change Time')
             
             
             

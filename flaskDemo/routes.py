@@ -9,7 +9,7 @@ from flaskDemo import app, db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_principal import Principal, Identity, AnonymousIdentity, identity_changed, Permission, RoleNeed, identity_loaded
 from flaskDemo.models import role,employee, unit,building,work,maintenance,apartmentrehab,others,landscaping,pestcontrol
-from flaskDemo.forms import ChangeEmailForm,ChangePhoneForm,ChangePasswordForm,ForgetForm,StartForm,BuildingForm,RegistrationForm,LoginForm,MaintenanceForm,ApartmentRehabForm,LandscapingForm,PestControlForm,OtherForm
+from flaskDemo.forms import EndTimeChangeForm,ChangeEmailForm,ChangePhoneForm,ChangePasswordForm,ForgetForm,StartForm,BuildingForm,RegistrationForm,LoginForm,MaintenanceForm,ApartmentRehabForm,LandscapingForm,PestControlForm,OtherForm
 from datetime import datetime, timedelta
 from sqlalchemy import or_, update, and_
 
@@ -759,6 +759,21 @@ def pest_control(workorder):
 # ---------------------------------------------------------------------------------------------------
     
 
+@app.route("/change_endtime/<string:worknumber>", methods=['GET', 'POST'])
+@login_required
+@admin_permission.require(http_exception=403)
+def change_endtime(worknumber):
+    form = EndTimeChangeForm()
+    if form.validate_on_submit():
+         Work = work.query.filter(work.workOrdernumber==worknumber).first()
+         Work.endTimeAuto = form.endTime.data
+         Work.endTimeManual = form.endTime.data
+         db.commit()
+         flash('End Time has been successfully changed','success')
+         return redirect(url_for('admin_front'))
+    return render_template('changeendtimes.html',form=form)
+
+
 
 @app.route("/admin_front",methods=['GET', 'POST'])
 @login_required
@@ -769,6 +784,7 @@ def admin_front():
 
 @app.route("/exporttocsv",methods=['GET', 'POST'])
 @login_required
+@admin_permission.require(http_exception=403)
 def exporttocsv():
     try:
         works=work.query.join(employee,work.employeeID==employee.employeeID)\
@@ -819,10 +835,13 @@ def exporttocsv():
         flash("Error exporting Excel file")
         return render_template("works1.html",works=works)
 
+
+
+
 class WorkView(BaseView):
     @expose('/')
-    
-    
+    @admin_permission.require(http_exception=403)
+
 
     def index(self):
        # works=work.query.join(employee,employee.employeeID==work.employeeID)\
@@ -845,6 +864,10 @@ class WorkView(BaseView):
 
     def is_accessible(self):
         return (current_user.is_authenticated and current_user.roleID ==3)
+    
+    
+    
+    
 
 
 class ModelView_building(ModelView):
