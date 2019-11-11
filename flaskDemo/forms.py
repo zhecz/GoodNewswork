@@ -144,7 +144,7 @@ class MaintenanceForm(FlaskForm):
     time = [('Yearly Maintenance', 'Yearly Maintenance'),('Work Order Maintenance', 'Work Order Maintenance')]
     yearOrworkOrder =SelectField('Yearly/Usual Maintenance', choices=time,validators=[DataRequired()])
     description =  StringField('Description',validators=[DataRequired()])
-    picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
+    picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
     submit = SubmitField('Submit')
    
     def validate_endTime(self,endTime):
@@ -159,7 +159,7 @@ class ApartmentRehabForm(FlaskForm):
     rehabType = SelectField('Rehabilitation Type', choices=apartreh,validators=[DataRequired()])
     others = StringField('If Others,please state:')
     description =  StringField('Description',validators=[DataRequired()])
-    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
+    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
     submit = SubmitField('Submit')
 
     def validate_endTime(self,endTime):
@@ -172,7 +172,7 @@ class LandscapingForm(FlaskForm):
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     landscapingType = StringField('Landscaping type',validators=[DataRequired()])
     description =  StringField('Description',validators=[DataRequired()])
-    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
+    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
     submit = SubmitField('Submit')
    
     def validate_endTime(self,endTime):
@@ -185,7 +185,7 @@ class LandscapingForm(FlaskForm):
 class PestControlForm(FlaskForm):
     endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
     description =  StringField('Description',validators=[DataRequired()])
-    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
+    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
     submit = SubmitField('Submit')
 
     def validate_endTime(self,endTime):
@@ -200,7 +200,7 @@ class OtherForm(FlaskForm):
     othersType = SelectField("Other Categories",choices = otherchoice,validators=[DataRequired()])
     other = StringField('if others please state:')
     description =  StringField('Description',validators=[DataRequired()])
-    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif']),FileRequired()])
+    picture =  picture = FileField('Detailed Picture', validators=[FileAllowed(['jpg', 'png','jfif'])])
     submit = SubmitField('Submit')
       
     def validate_endTime(self,endTime):

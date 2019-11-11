@@ -873,7 +873,7 @@ def exporttocsv():
 def workfind(startTime,endTime):
      works=work.query.join(employee,work.employeeID==employee.employeeID)\
                     .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
-                        work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns((work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
+                        work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns(work.workOrdernumber,(work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
                             .join(building, work.buildingID==building.buildingID)\
                                 .add_columns(building.buildingName)\
                                     .filter(work.startTimeAuto>startTime).filter(work.endTimeAuto<endTime)\
