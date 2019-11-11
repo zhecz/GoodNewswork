@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+
+<h1>hello</h1>
+
+
+
+<form method="POST" action="" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+             <div style="margin: 10px;" >
+
+            <div class="form-group" name="Start Time" placeholder='start time'>
+                    
+             <font color="#fff"> {{ form.startTime.label(class="form-control-label") }}</font>
+            {% if form.startTime.errors %}
+                {{ form.startTime(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.startTime.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.startTime(class="form-control form-control-lg") }}
+            {% endif %}
+        </div> </div>
+
+        <div style="margin: 10px;">
+            <div class="form-group">
+             <font color="#fff"> {{ form.endTime.label(class="form-control-label") }}</font>
+            {% if form.endTime.errors %}
+                {{ form.endTime(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.endTime.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.endTime(class="form-control form-control-lg") }}
+            {% endif %}
+        </div> </div>
+
+
+
+        <li><div class="form-group">
+            <center> {{ form.submit(class="btn-show-contact100") }}</center>
+         </div></li>
+         
+         </form>       
+{% endblock content %}         

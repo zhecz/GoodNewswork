@@ -15,6 +15,53 @@
 
 
 <h1 style="text-align:center;">Work</h1>
+
+<center><fieldset style="border: 0; width: 40%;">
+<form method="POST" action="" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+           
+
+            <div class="form-group" style="float:left">
+                    
+             <font color="#000000"> {{ form.startTime.label(class="form-control-label") }}</font>
+            {% if form.startTime.errors %}
+                {{ form.startTime(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.startTime.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.startTime(class="form-control form-control-lg") }}
+            {% endif %}
+        </div> </div>
+
+     
+            <div class="form-group" style="float:right">
+             <font color="#000000"> {{ form.endTime.label(class="form-control-label") }}</font>
+            {% if form.endTime.errors %}
+                {{ form.endTime(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.endTime.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.endTime(class="form-control form-control-lg") }}
+            {% endif %}
+        </div> </div>
+
+
+</fieldset> </center>
+<fieldset style="border: 0;">
+        <center><div class="form-group">
+            <center> {{ form.submit(class="btn-show-contact100") }}</center>
+         </div></center>
+         
+         </form>       
+</fieldset>
+
+
 <table class="blueTable">
     <thead>
     <tr>
@@ -56,7 +103,7 @@
         <td>{{work.endTimeManual}}</td>
         <td>{{work.hours_work_auto}}</td>
         <td>{{work.hours_work_manual}}</td>
-        <td><a href="{{ url_for('change_endtime',worknumber=work.workOrdernumber) }}">Change end time</a></td>
+       <td> <a href="{{ url_for('change_endtime', number=work.workOrdernumber) }}">Change end time</a></td>
     </tr>
     {% endfor %}
     </tbody>

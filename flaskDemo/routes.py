@@ -9,7 +9,7 @@ from flaskDemo import app, db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_principal import Principal, Identity, AnonymousIdentity, identity_changed, Permission, RoleNeed, identity_loaded
 from flaskDemo.models import role,employee, unit,building,work,maintenance,apartmentrehab,others,landscaping,pestcontrol
-from flaskDemo.forms import EndTimeChangeForm,ChangeEmailForm,ChangePhoneForm,ChangePasswordForm,ForgetForm,StartForm,BuildingForm,RegistrationForm,LoginForm,MaintenanceForm,ApartmentRehabForm,LandscapingForm,PestControlForm,OtherForm
+from flaskDemo.forms import TimerangeForm,EndTimeChangeForm,ChangeEmailForm,ChangePhoneForm,ChangePasswordForm,ForgetForm,StartForm,BuildingForm,RegistrationForm,LoginForm,MaintenanceForm,ApartmentRehabForm,LandscapingForm,PestControlForm,OtherForm
 from datetime import datetime, timedelta
 from sqlalchemy import or_, update, and_
 
@@ -135,7 +135,7 @@ def emailsend(subject,emailsender,text):
 #    
 #    db.session.commit()
 #    hashed_password = bcrypt.generate_password_hash("gnp7737644998").decode('utf-8')
-#    adminuser = employee(firstName="Good News",lastName="Partners",username="goodnews24",password=hashed_password,phoneNumber = "7737644998",email = "Brandon@goodnewspartners.org",roleID = 3 )   
+#    adminuser = employee(firstName="Good News",lastName="Partners",username="goodnews24",password=hashed_password,phoneNumber = "7737644998",email = "Brandon@goodnewspartners.org",roleID = 3 ,verified = True)   
 #    db.session.add(adminuser)
 #    db.session.commit()
 #    
@@ -150,7 +150,7 @@ def emailsend(subject,emailsender,text):
 #  
 #    return redirect(url_for('home'))   
 
-#
+
 
 
 #Employee manipulation 
@@ -182,7 +182,10 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         Employee = employee.query.filter_by(username=form.username.data).first()
-        if Employee and bcrypt.check_password_hash(Employee.password, form.password.data):
+        if Employee.verified == False:
+            flash("Id is not yet approved by admin, please contact Brandon/Ken","danger")
+            return redirect(url_for('home'))
+        elif Employee and bcrypt.check_password_hash(Employee.password, form.password.data):
             login_user(Employee, remember=form.remember.data)
             identity_changed.send(current_app._get_current_object(),
                                   identity=Identity(Employee.employeeID))
@@ -202,7 +205,7 @@ def register():
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         roleID = role.query.filter_by(roleName = form.position.data).first()
-        Employee = employee(firstName=form.firstName.data,lastName=form.lastName.data,username=form.username.data,password=hashed_password,phoneNumber = form.phone.data,email = form.email.data,roleID = roleID.roleID)
+        Employee = employee(firstName=form.firstName.data,lastName=form.lastName.data,username=form.username.data,password=hashed_password,phoneNumber = form.phone.data,email = form.email.data,roleID = roleID.roleID, verified= False)
         db.session.add(Employee)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -290,6 +293,7 @@ def changeemail():
         except:
             flash("Email change not successful","danger")
     return render_template("changeemail.html",form=form)
+
 
 
 @app.route("/changephone", methods=['GET', 'POST'])
@@ -755,20 +759,21 @@ def pest_control(workorder):
    
     return render_template('pestcontrol.html', title='Pest Control', form=form)
  
+    
 #admin form
 # ---------------------------------------------------------------------------------------------------
     
 
-@app.route("/change_endtime/<string:worknumber>", methods=['GET', 'POST'])
+@app.route("/change_endtime/<string:number>", methods=['GET', 'POST'])
 @login_required
 @admin_permission.require(http_exception=403)
-def change_endtime(worknumber):
+def change_endtime(number):
     form = EndTimeChangeForm()
     if form.validate_on_submit():
-         Work = work.query.filter(work.workOrdernumber==worknumber).first()
+         Work = work.query.filter(work.workOrdernumber==number).first()
          Work.endTimeAuto = form.endTime.data
          Work.endTimeManual = form.endTime.data
-         db.commit()
+         db.session.commit()
          flash('End Time has been successfully changed','success')
          return redirect(url_for('admin_front'))
     return render_template('changeendtimes.html',form=form)
@@ -780,6 +785,35 @@ def change_endtime(worknumber):
 @admin_permission.require(http_exception=403)
 def admin_front():
     return redirect('/admin')
+
+@app.route("/timerange",methods=['Get','Post'])
+@login_required
+@admin_permission.require(http_exception=403)
+def timerange():
+    form=TimerangeForm()
+    if form.validate_on_submit():
+        startTime=form.startTime.data
+        endTime=form.endTime.data
+        works=works=work.query.join(employee,work.employeeID==employee.employeeID)\
+                .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
+                    work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns((work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
+                        .join(building, work.buildingID==building.buildingID)\
+                            .add_columns(building.buildingName)\
+                                .filter(work.startTimeAuto>startTime).filter(work.endTimeAuto<endTime)\
+                   .order_by(employee.employeeID.desc()).all() 
+        
+        
+        
+        
+        #work.query.filter(work.startTimeAuto>startTime).filter(work.endTimeAuto<endTime).all()
+        print(works)
+        return render_template("works1.html",works=works,form=form)
+
+
+
+
+
+    return render_template('works_time_range.html', form=form)
 
 
 @app.route("/exporttocsv",methods=['GET', 'POST'])
@@ -836,6 +870,43 @@ def exporttocsv():
         return render_template("works1.html",works=works)
 
 
+def workfind(startTime,endTime):
+     works=work.query.join(employee,work.employeeID==employee.employeeID)\
+                    .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
+                        work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns((work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
+                            .join(building, work.buildingID==building.buildingID)\
+                                .add_columns(building.buildingName)\
+                                    .filter(work.startTimeAuto>startTime).filter(work.endTimeAuto<endTime)\
+                       .order_by(employee.employeeID.desc()).all() 
+     return works
+                       
+@app.route("/work_table",methods=['GET', 'POST'])
+@login_required
+@admin_permission.require(http_exception=403)
+def work_table():
+    form=TimerangeForm()
+    start = datetime(1000,1,1,1,1,1)
+    end = datetime(9999,1,1,1,1,1)
+    works=workfind(start,end)
+    if form.validate_on_submit():
+        startTime=form.startTime.data
+        endTime=form.endTime.data
+        works = workfind(startTime,endTime)
+        #work.query.filter(work.startTimeAuto>startTime).filter(work.endTimeAuto<endTime).all()
+    
+   # works=work.query.join(employee,employee.employeeID==work.employeeID)\
+       # .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
+           # work.startTimeAuto,\
+                #work.endTimeAuto, work.startTimeManual, work.endTimeManual).\
+                   # group_by(employee.employeeID).all()
+    
+           
+    
+        
+    #work.query.group_by(work.employeeID).all()               
+    print(works)
+    return render_template('works1.html', works=works, form=form)
+
 
 
 class WorkView(BaseView):
@@ -844,24 +915,7 @@ class WorkView(BaseView):
 
 
     def index(self):
-       # works=work.query.join(employee,employee.employeeID==work.employeeID)\
-           # .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
-               # work.startTimeAuto,\
-                    #work.endTimeAuto, work.startTimeManual, work.endTimeManual).\
-                       # group_by(employee.employeeID).all()
-        works=work.query.join(employee,work.employeeID==employee.employeeID)\
-            .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
-                work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns((work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
-                    .join(building, work.buildingID==building.buildingID)\
-                        .add_columns(building.buildingName)\
-               .order_by(employee.employeeID.desc()).all()      
-               
-        
-            
-        #work.query.group_by(work.employeeID).all()               
-        print(works)
-        return self.render('works1.html', works=works)
-
+        return redirect(url_for('work_table'))
     def is_accessible(self):
         return (current_user.is_authenticated and current_user.roleID ==3)
     
@@ -876,6 +930,9 @@ class ModelView_building(ModelView):
 
 
 class ModelView_employee(ModelView):
+    column_editable_list = ['verified']
+    can_edit = False
+    column_exclude_list = ['password']
     def is_accessible(self):
         return (current_user.is_authenticated and current_user.roleID ==3)
 

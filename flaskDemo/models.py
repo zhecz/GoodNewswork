@@ -30,6 +30,7 @@ class employee(db.Model, UserMixin):
     password = db.Column(db.String(70), nullable=False)
     phoneNumber = db.Column(db.String(12), nullable=False)
     email = db.Column(db.String(100), nullable=False)
+    verified = db.Column(db.Boolean, nullable=False)
     roleID = db.Column(db.Integer, db.ForeignKey('Role.roleID'), nullable=False)
     def get_id(self): 
         return (self.employeeID)
