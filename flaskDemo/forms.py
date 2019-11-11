@@ -22,9 +22,12 @@ class ForgetForm (FlaskForm):
         if user is None:
             raise ValidationError('Email not found in database')
 
+
+timechoice = [('Auto','Auto'),('Manual','Manual')]
 class TimerangeForm(FlaskForm):
      startTime = DateTimeLocalField('Start Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
      endTime = DateTimeLocalField('End Time',format='%Y-%m-%dT%H:%M',validators=[InputRequired()] )
+     timeFormat = SelectField('Type',choices=timechoice, validators=[DataRequired()],default=None)
      submit=SubmitField('Submit')
             
 

@@ -870,15 +870,25 @@ def exporttocsv():
         return render_template("works1.html",works=works)
 
 
-def workfind(startTime,endTime):
-     works=work.query.join(employee,work.employeeID==employee.employeeID)\
-                    .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
-                        work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns(work.workOrdernumber,(work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
-                            .join(building, work.buildingID==building.buildingID)\
-                                .add_columns(building.buildingName)\
-                                    .filter(work.startTimeAuto>startTime).filter(work.endTimeAuto<endTime)\
-                       .order_by(employee.employeeID.desc()).all() 
-     return works
+def workfind(startTime,endTime,Type):
+    if Type == "Manual":
+         works=work.query.join(employee,work.employeeID==employee.employeeID)\
+                        .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
+                            work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns(work.workOrdernumber,(work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
+                                .join(building, work.buildingID==building.buildingID)\
+                                    .add_columns(building.buildingName)\
+                                        .filter(work.startTimeManual>=startTime).filter(work.endTimeManual<=endTime)\
+                           .order_by(employee.employeeID.desc()).all() 
+         return works
+    elif Type =="Auto":
+         works=work.query.join(employee,work.employeeID==employee.employeeID)\
+                        .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
+                            work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns(work.workOrdernumber,(work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
+                                .join(building, work.buildingID==building.buildingID)\
+                                    .add_columns(building.buildingName)\
+                                        .filter(work.startTimeAuto>=startTime).filter(work.endTimeAuto<=endTime)\
+                           .order_by(employee.employeeID.desc()).all() 
+         return works
                        
 @app.route("/work_table",methods=['GET', 'POST'])
 @login_required
@@ -887,23 +897,13 @@ def work_table():
     form=TimerangeForm()
     start = datetime(1000,1,1,1,1,1)
     end = datetime(9999,1,1,1,1,1)
-    works=workfind(start,end)
+    works=workfind(start,end,"Manual")
     if form.validate_on_submit():
         startTime=form.startTime.data
         endTime=form.endTime.data
-        works = workfind(startTime,endTime)
-        #work.query.filter(work.startTimeAuto>startTime).filter(work.endTimeAuto<endTime).all()
-    
-   # works=work.query.join(employee,employee.employeeID==work.employeeID)\
-       # .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
-           # work.startTimeAuto,\
-                #work.endTimeAuto, work.startTimeManual, work.endTimeManual).\
-                   # group_by(employee.employeeID).all()
-    
-           
-    
-        
-    #work.query.group_by(work.employeeID).all()               
+        Type = form.timeFormat.data
+        works = workfind(startTime,endTime,Type)
+              
     print(works)
     return render_template('works1.html', works=works, form=form)
 

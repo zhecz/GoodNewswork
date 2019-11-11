@@ -50,10 +50,28 @@
                 {{ form.endTime(class="form-control form-control-lg") }}
             {% endif %}
         </div> </div>
+        
+          
 
 
 </fieldset> </center>
 <fieldset style="border: 0;">
+<center><div class="form-group" style="margin 10px;">
+             <font color="#000000"> {{ form.timeFormat.label(class="form-control-label") }}</font>
+            {% if form.timeFormat.errors %}
+                {{ form.timeFormat(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.timeFormat.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.timeFormat(class="form-control form-control-lg") }}
+            {% endif %}
+        </div> </div></center>
+</fieldset>
+<fieldset style="border: 0;">      
+        
         <center><div class="form-group">
             <center> {{ form.submit(class="btn-show-contact100") }}</center>
          </div></center>
