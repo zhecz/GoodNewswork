@@ -8,7 +8,7 @@ from flask import render_template, url_for, flash, redirect, request, abort, cur
 from flaskDemo import app, db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_principal import Principal, Identity, AnonymousIdentity, identity_changed, Permission, RoleNeed, identity_loaded
-from flaskDemo.models import role,employee, unit,building,work,maintenance,apartmentrehab,others,landscaping,pestcontrol
+from flaskDemo.models import employee, unit,building,work,maintenance,apartmentrehab,others,landscaping,pestcontrol
 from flaskDemo.forms import TimerangeForm,EndTimeChangeForm,ChangeEmailForm,ChangePhoneForm,ChangePasswordForm,ForgetForm,StartForm,BuildingForm,RegistrationForm,LoginForm,MaintenanceForm,ApartmentRehabForm,LandscapingForm,PestControlForm,OtherForm
 from datetime import datetime, timedelta
 from sqlalchemy import or_, update, and_
@@ -22,8 +22,8 @@ from email.mime.multipart import MIMEMultipart
 import flaskDemo.authorize as authorize
 
 from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
-from flask_admin import BaseView, expose
+from flask_admin.contrib.sqla import ModelView 
+from flask_admin import BaseView, expose ,AdminIndexView
 from pandas import DataFrame
 
 
@@ -56,9 +56,9 @@ drive_service = discovery.build('drive', 'v3', http=http)
 admin_permission = Permission(RoleNeed('admin'))
 admin=Admin(app)
 
-maintainence_permission = Permission(RoleNeed(1))
-frontdesk_permission = Permission(RoleNeed(2))
-admin_permission = Permission(RoleNeed(3))
+maintainence_permission = Permission(RoleNeed("Maintenance"))
+frontdesk_permission = Permission(RoleNeed("Front Desk"))
+admin_permission = Permission(RoleNeed("admin"))
 
 #Configure db
 #Methods created 
@@ -115,9 +115,7 @@ def emailsend(subject,emailsender,text):
 #    Building7 = building(buildingName='Phoenix 1',buildingAddress='7729-31 N. Hermitage Avenue',postalCode =60626 ,numberOfrooms= 200)
 #    Building8 = building(buildingName='Phoenix 2',buildingAddress='7727 N. Hermitage Avenue',postalCode =60626 ,numberOfrooms= 200)
 #    Building9 = building(buildingName='Jonquil',buildingAddress='1600 W. Jonquil Terrace 7700 N. Ashland',postalCode =60626 ,numberOfrooms= 200)
-#    Role1 = role(roleName = "Maintenance")
-#    Role2 = role(roleName = "Front Desk")
-#    Role3 = role(roleName = "admin")
+#
 #    db.session.add(Building)
 #    db.session.add(Building1)
 #    db.session.add(Building2)
@@ -128,14 +126,17 @@ def emailsend(subject,emailsender,text):
 #    db.session.add(Building7)
 #    db.session.add(Building8)
 #    db.session.add(Building9)
-#    db.session.add(Role1)
-#    db.session.add(Role2)
-#    db.session.add(Role3)
+##    Role1 = role(roleName = "Maintenance")
+##    Role2 = role(roleName = "Front Desk")
+##    Role3 = role(roleName = "admin")
+##    db.session.add(Role1)
+##    db.session.add(Role2)
+##    db.session.add(Role3)
 #    
 #    
 #    db.session.commit()
 #    hashed_password = bcrypt.generate_password_hash("gnp7737644998").decode('utf-8')
-#    adminuser = employee(firstName="Good News",lastName="Partners",username="goodnews24",password=hashed_password,phoneNumber = "7737644998",email = "Brandon@goodnewspartners.org",roleID = 3 ,verified = True)   
+#    adminuser = employee(firstName="Good News",lastName="Partners",username="goodnews24",password=hashed_password,phoneNumber = "7737644998",email = "Brandon@goodnewspartners.org",verified = True,roleName = "admin" )   
 #    db.session.add(adminuser)
 #    db.session.commit()
 #    
@@ -204,8 +205,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        roleID = role.query.filter_by(roleName = form.position.data).first()
-        Employee = employee(firstName=form.firstName.data,lastName=form.lastName.data,username=form.username.data,password=hashed_password,phoneNumber = form.phone.data,email = form.email.data,roleID = roleID.roleID, verified= False)
+        Employee = employee(firstName=form.firstName.data,lastName=form.lastName.data,username=form.username.data,password=hashed_password,phoneNumber = form.phone.data,email = form.email.data,roleName = form.position.data , verified= False)
         db.session.add(Employee)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -319,11 +319,11 @@ def changephone():
 @login_required
 def front(): #render frontpage buttons
     Employee = employee.query.filter_by(employeeID = current_user.employeeID).first()
-    if Employee.roleID == 1:
+    if Employee.roleName == "Maintenance":
         return render_template('frontpage-maintainence.html')
-    elif Employee.roleID == 2:
+    elif Employee.roleName == "Front Desk":
         return render_template('frontpage-frontdesk.html')
-    elif Employee.roleID == 3:
+    elif Employee.roleName == "admin":
         return redirect(url_for('admin_front'))
 
 
@@ -794,7 +794,7 @@ def timerange():
     if form.validate_on_submit():
         startTime=form.startTime.data
         endTime=form.endTime.data
-        works=works=work.query.join(employee,work.employeeID==employee.employeeID)\
+        works=work.query.join(employee,work.employeeID==employee.employeeID)\
                 .add_columns(employee.employeeID, employee.firstName,employee.lastName, work.buildingID,\
                     work.workType, work.endTimeAuto, work.startTimeAuto,work.endTimeManual,work.startTimeManual).add_columns((work.endTimeAuto-work.startTimeAuto).label("hours_work_auto"),(work.endTimeManual-work.startTimeManual).label("hours_work_manual"))\
                         .join(building, work.buildingID==building.buildingID)\
@@ -910,6 +910,9 @@ def work_table():
 
 
 class WorkView(BaseView):
+    
+    
+    
     @expose('/')
     @admin_permission.require(http_exception=403)
 
@@ -917,24 +920,48 @@ class WorkView(BaseView):
     def index(self):
         return redirect(url_for('work_table'))
     def is_accessible(self):
-        return (current_user.is_authenticated and current_user.roleID ==3)
+        return (current_user.is_authenticated and current_user.roleName =="admin")
     
     
     
-    
+
 
 
 class ModelView_building(ModelView):
+    
+    def delete_model(self, model):
+        try:
+            units = unit.query.filter(unit.buildingID==model.buildingID).all()
+            for i in units:
+                db.session.delete(i)
+            
+            build = building.query.filter(building.buildingID ==model.buildingID).first()
+            db.session.delete(build)
+            db.session.commit()
+           
+            flash("Building and Units Deleted",'success')
+        except:
+            flash("ERROR","error")
+    
     def is_accessible(self):
-        return (current_user.is_authenticated and current_user.roleID ==3)
+        return (current_user.is_authenticated and current_user.roleName =="admin")
+
+
 
 
 class ModelView_employee(ModelView):
-    column_editable_list = ['verified']
+    
+
+    form_choices = { 'roleName': [ ('Maintenance', 'Maintenance'), ("Front Desk", "Front Desk"),("admin","admin")]}
+    column_editable_list = ['verified','roleName']
+    
     can_edit = False
+    column_hide_backrefs = False
+    
+    
     column_exclude_list = ['password']
     def is_accessible(self):
-        return (current_user.is_authenticated and current_user.roleID ==3)
+        return (current_user.is_authenticated and current_user.roleName =="admin")
 
 class WorkView_logout(BaseView):
     @expose('/')
@@ -942,13 +969,17 @@ class WorkView_logout(BaseView):
         return redirect(url_for('logout'))
 
 class ModelView_unit(ModelView):
+    column_searchable_list = ('unitName', 'building.buildingName')
+    column_default_sort = "building.buildingName"
     def is_accessible(self):
-        return (current_user.is_authenticated and current_user.roleID ==3)
         
-    column_list = ('unitID', 'unitName', 'building') 
+        return (current_user.is_authenticated and current_user.roleName =="admin")
+        
+   
 
-admin.add_view(ModelView_building(building,db.session))  
-admin.add_view(ModelView(unit,db.session, name='Unit'))
-admin.add_view(ModelView_employee(employee,db.session))
-admin.add_view(WorkView(name='Work', endpoint='work'))
+
+admin.add_view(ModelView_building(building,db.session,name="Building"))  
+admin.add_view(ModelView_unit(unit,db.session, name='Unit'))
+admin.add_view(ModelView_employee(employee,db.session, name="Employee"))
+admin.add_view(WorkView(name='Work', endpoint='Work'))
 admin.add_view(WorkView_logout(name="Logout", endpoint='logout'))

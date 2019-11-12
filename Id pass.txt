@@ -7,3 +7,6 @@ Azure
 servername: goodnewswork
 admin login: goodnews24
 password: gnp7737644998!
+
+
+popMaz22@outlook.com

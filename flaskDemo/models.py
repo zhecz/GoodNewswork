@@ -11,12 +11,12 @@ Base = declarative_base()
 def load_user(user_id):
     return employee.query.get(int(user_id))
 
-class role(db.Model, UserMixin):
-    __tablename__ = 'Role'
-    __table_args__ = {'extend_existing': False}
-    roleID = db.Column(db.Integer, primary_key=True)
-    roleName = db.Column(db.String(25), nullable=False)
-    #employee = db.relationship("Employee",backref = 'role',lazy = True)
+#class role(db.Model, UserMixin):
+#    __tablename__ = 'Role'
+#    __table_args__ = {'extend_existing': False}
+#    roleID = db.Column(db.Integer, primary_key=True)
+#    roleName = db.Column(db.String(25), nullable=False)
+    #employee = db.relationship("employee",backref = 'parent',lazy = True)
     
 
 
@@ -31,7 +31,8 @@ class employee(db.Model, UserMixin):
     phoneNumber = db.Column(db.String(12), nullable=False)
     email = db.Column(db.String(100), nullable=False)
     verified = db.Column(db.Boolean, nullable=False)
-    roleID = db.Column(db.Integer, db.ForeignKey('Role.roleID'), nullable=False)
+    roleName = db.Column(db.String , nullable=False)
+  #  role = db.relationship('role', backref="roles")
     def get_id(self): 
         return (self.employeeID)
 
