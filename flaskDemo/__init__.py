@@ -8,7 +8,7 @@ import urllib.parse
 
 
 
-params = urllib.parse.quote_plus("Driver={ODBC Driver 13 for SQL Server};Server=tcp:goodnews24.database.windows.net,1433;Database=workmanagement;Uid=goodnews24;Pwd=gnp7737644998!;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;")
+params = urllib.parse.quote_plus("Driver={ODBC Driver 17 for SQL Server};Server=tcp:goodnewspartnerswork.database.windows.net,1433;Database=workmanagementSQL;Uid=goodnews24;Pwd=gnp7737644998!;Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;")
 
 
 

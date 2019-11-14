@@ -4,7 +4,7 @@ password:goodnews24
 
 Azure
 
-servername: goodnewswork
+servername: goodnewspartnerswork
 admin login: goodnews24
 password: gnp7737644998!
 
